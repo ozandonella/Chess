@@ -15,7 +15,7 @@ public class Pawn extends Piece{
     public void makeMove(int[] pos, int[] dest) {
         if(pos[0]!=dest[0]&&board.query(dest)==null) board.pop(dest[0], pos[1]);
         board.set(board.pop(pos),dest);
-        if(turnMoved==null) turnMoved= board.moveCount;
+        if(turnMoved==null) turnMoved=board.moveCount;
         charged = board.moveCount==turnMoved&&Math.abs(pos[1]-dest[1])==2;
     }
 

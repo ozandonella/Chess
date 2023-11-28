@@ -10,10 +10,9 @@ public class Main {
     public static String[][] whitePieces;
     public static String[][] blackPieces;
     public static void main(String[] args) {
-        Board b = new Board(9,3);
+        Board b = new Board(9, 3);
         b.populate();
-        b.play("jinshiVsDingLiren.txt");
-
+        b.play();
         /*b.board.get(0).get(4).move(new int[]{2,5});
         System.out.println();
         b.board.get(7).get(4).move(new int[]{0,2});*/
@@ -50,8 +49,9 @@ public class Main {
         s.set(blackPieces[3],66,44);
         s.set(blackPieces[2],78,44);
         s.set(blackPieces[1],90,44);
-        s.print();
+        s.print();*/
     }
+
     public static void getPieces() throws IOException {
         Scanner s = new Scanner(Paths.get("newPieces"));
         whitePieces=new String[6][];
@@ -62,6 +62,6 @@ public class Main {
         }
         for(int x=0; x<6; x++){
             whitePieces[x]=s.nextLine().split(";");
-        }*/
+        }
     }
 }

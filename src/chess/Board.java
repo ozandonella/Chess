@@ -60,24 +60,14 @@ public class Board {
     public void play(){
         Scanner s = new Scanner(System.in);
         print();
-        while(whiteWon==null&&s.hasNext()) {
+        while(whiteWon==null) {
             String in = s.nextLine();
-            while(true) {
-                try {
-                    Integer.parseInt(in);
-                    if(in.length()!=4) throw new Exception();
-                    break;
-                }
-                catch(Exception e) {
-                    System.out.println("Invalid input");
-                    s.next();
-                }
+            if(in.length()!=4){
+                System.out.println("Invalid Input");
+                continue;
             }
-            movePiece(new int[] {in.charAt(0)-'0', in.charAt(1)-'0'}, new int[] {in.charAt(2)-'0', in.charAt(3)-'0'},whiteTurn);
-            whiteTurn=moveCount%2==0;
-            System.out.println();
+            movePiece(new int[]{Character.toUpperCase(in.charAt(0)) - 'A', in.charAt(1) - '1'}, new int[]{Character.toUpperCase(in.charAt(2)) - 'A', in.charAt(3) - '1'}, whiteTurn);
         }
-        print();
         System.out.println(whiteWon ? "White " : "Black "+ "Wins!");
     }
     public void play(String address) {
@@ -117,15 +107,17 @@ public class Board {
         if (piece!=null&&piece.isWhite==isWhite&&piece.canMove(pos,dest,true)){
             fillSquare('=',pos);
             for (Integer [] m : getMoves(pos)) fillSquare(':',new int[]{m[0],m[1]});
-            print();
             piece.makeMove(pos,dest);
+            print();
             moveCount++;
+            whiteTurn=!whiteTurn;
             System.out.println();
             System.out.println("Move Successful: "+piece+" "+Arrays.toString(pos)+ "->"+Arrays.toString(dest));
             if(isMate(!isWhite)) whiteWon=isWhite;
         }
         else {
-            throw new RuntimeException("Move Failed: "+piece+" "+Arrays.toString(pos)+ "->"+Arrays.toString(dest));
+            System.out.println("Move Failed: "+piece+" "+Arrays.toString(pos)+ "->"+Arrays.toString(dest));
+            //throw new RuntimeException("Move Failed: "+piece+" "+Arrays.toString(pos)+ "->"+Arrays.toString(dest));
         }
 
     }
