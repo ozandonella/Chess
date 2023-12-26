@@ -1,18 +1,14 @@
 package chess;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Paths;
-import java.util.Formatter;
 import java.util.Scanner;
-
 public class Main {
     public static String[][] whitePieces;
     public static String[][] blackPieces;
     public static void main(String[] args) {
-        Board b = new Board(9, 3);
+        Board b = new Board(13, 5);
         b.populate();
-        b.play();
+        b.play("jinshiVsDingLiren.txt");
         /*b.board.get(0).get(4).move(new int[]{2,5});
         System.out.println();
         b.board.get(7).get(4).move(new int[]{0,2});*/

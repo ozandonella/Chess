@@ -48,7 +48,7 @@ public class King extends Piece{
      * @param king king position
      * @param dest king destination
      * @param rook rook position
-     * @return rook destination
+     * @return rook destination after making a castle with the inputted move or null if castle does not exist
      */
     public int[] existsCastle(int[] king, int[] dest, int[] rook){
         Piece piece = board.query(rook);

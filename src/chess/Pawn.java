@@ -10,7 +10,6 @@ public class Pawn extends Piece{
         charged=false;
     }
 
-
     @Override
     public void makeMove(int[] pos, int[] dest) {
         if(pos[0]!=dest[0]&&board.query(dest)==null) board.pop(dest[0], pos[1]);
@@ -18,7 +17,6 @@ public class Pawn extends Piece{
         if(turnMoved==null) turnMoved=board.moveCount;
         charged = board.moveCount==turnMoved&&Math.abs(pos[1]-dest[1])==2;
     }
-
     @Override
     public boolean canMove(int[] pos, int[] dest, boolean withSafety) {
         if(board.query(pos)==null||!board.query(pos).equals(this)) return false;
@@ -39,6 +37,12 @@ public class Pawn extends Piece{
         board.set(piece,dest);
         return !inCheck;
     }
+
+    /**
+     * @param pos pos of this pawn
+     * @param dest destination this pawn is moving to
+     * @return the dest of the opposing pawn that gets attacked if their exists an enPassant else null
+     */
     public int[] existsEnPassant(int[] pos, int[] dest){
         if(Board.outOfBounds(dest)) return null;
         int x = Math.abs(pos[0]-dest[0]), y = Math.abs(pos[1]-dest[1]);
@@ -50,8 +54,6 @@ public class Pawn extends Piece{
     @Override
     public boolean canAttack(int[] pos, int[] dest, boolean withSafety) {
         int[] enPass = existsEnPassant(pos,new int[]{dest[0],dest[1]+(isWhite ? 1 : -1)});
-        //System.out.println(Arrays.toString(pos)+" attacking "+Arrays.toString(dest)+" enPass location "+Arrays.toString(enPass));
-        //System.out.println(Arrays.toString(pos)+" attacking "+Arrays.toString(dest)+" enPass location "+(Arrays.toString(enPass))+(pos[0]!=dest[0]&&(enPass!=null||canMove(pos,dest,withSafety))));
         return pos[0]!=dest[0]&&(enPass!=null||canMove(pos,dest,withSafety));
     }
 }
