@@ -1,7 +1,4 @@
 package chess;
-
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,26 +31,26 @@ public class Board {
     public void populate(){
         for(int y=0; y<8; y++){
             if(y==0){
-                set(new Rook("Rook", true, this,0,y),0,y);
-                set(new Horse("Horse", true, this,1,y),1,y);
-                set(new Bishop("Bishop", true, this,2,y),2,y);
-                set(new Queen("Queen", true, this,3,y),3,y);
-                set(new King("King", true, this,4,y),4,y);
-                set(new Bishop("Bishop", true, this,5,y),5,y);
-                set(new Horse("Horse", true, this,6,y),6,y);
-                set(new Rook("Rook", true, this,7,y),7,y);
+                set(new Rook("Rook", true, this),0,y);
+                set(new Horse("Horse", true, this),1,y);
+                set(new Bishop("Bishop", true, this),2,y);
+                set(new Queen("Queen", true, this),3,y);
+                set(new King("King", true, this),4,y);
+                set(new Bishop("Bishop", true, this),5,y);
+                set(new Horse("Horse", true, this),6,y);
+                set(new Rook("Rook", true, this),7,y);
             }
-            else if(y==1) for(int i=0; i<8; i++) set(new Pawn("Pawn", true, this,i,y),i,y);
-            else if(y==6) for(int i=0; i<8; i++) set(new Pawn("Pawn", false, this,i,y),i,y);
+            else if(y==1) for(int i=0; i<8; i++) set(new Pawn("Pawn", true, this),i,y);
+            else if(y==6) for(int i=0; i<8; i++) set(new Pawn("Pawn", false, this),i,y);
             else if(y==7){
-                set(new Rook("Rook", false, this, 0,y),0,y);
-                set(new Horse("Horse", false, this,1,y),1,y);
-                set(new Bishop("Bishop", false, this,2,y),2,y);
-                set(new Queen("Queen", false, this,3,y),3,y);
-                set(new King("King", false, this,4,y),4,y);
-                set(new Bishop("Bishop", false, this,5,y),5,y);
-                set(new Horse("Horse", false, this,6,y),6,y);
-                set(new Rook("Rook", false, this,7,y),7,y);
+                set(new Rook("Rook", false, this),0,y);
+                set(new Horse("Horse", false, this),1,y);
+                set(new Bishop("Bishop", false, this),2,y);
+                set(new Queen("Queen", false, this),3,y);
+                set(new King("King", false, this),4,y);
+                set(new Bishop("Bishop", false, this),5,y);
+                set(new Horse("Horse", false, this),6,y);
+                set(new Rook("Rook", false, this),7,y);
             }
         }
     }
@@ -104,20 +101,21 @@ public class Board {
             return;
         }
         Piece piece = query(pos[0],pos[1]);
-        if (piece!=null&&piece.isWhite==isWhite&&piece.canMove(pos,dest,true)){
+        System.out.println("attempting: "+piece+ " -> "+convertPos(dest));
+        if (piece!=null&&piece.isWhite==isWhite&&piece.canMove(dest,true)){
             fillSquare('=',pos);
             for (Integer [] m : getMoves(pos)) fillSquare(':',new int[]{m[0],m[1]});
-            piece.makeMove(pos,dest);
+            piece.makeMove(dest);
+            System.out.println("Move Successful!");
             print();
             moveCount++;
             whiteTurn=!whiteTurn;
             System.out.println();
-            System.out.println("Move Successful: "+piece+" "+Arrays.toString(pos)+ "->"+Arrays.toString(dest));
             if(isMate(!isWhite)) whiteWon=isWhite;
         }
         else {
-            System.out.println("Move Failed: "+piece+" "+Arrays.toString(pos)+ "->"+Arrays.toString(dest));
-            //throw new RuntimeException("Move Failed: "+piece+" "+Arrays.toString(pos)+ "->"+Arrays.toString(dest));
+            System.out.println("Move Failed :(");
+            throw new RuntimeException("Move failed");
         }
 
     }
@@ -128,7 +126,7 @@ public class Board {
             if(y>7||y<0) continue;
             for(int x=dest[0]-1; x<dest[0]+2; x++){
                 if(x>7||x<0||(x==dest[0]&&y==dest[1])) continue;
-                boolean safe = query(dest).canMove(dest,new int[]{x,y},true);
+                boolean safe = query(dest).canMove(new int[]{x,y},true);
                 if(safe) return false;
             }
         }
@@ -144,16 +142,13 @@ public class Board {
             tLoc[1]+=tLoc[1]<dest[1] ? 1 : -1;
             for(Integer[] p : getPieces(isWhite)){
                 int[] dLoc=new int[]{p[0],p[1]};
-                if(query(p).canMove(dLoc,tLoc, true)) return false;
+                if(query(p).canMove(dLoc, true)) return false;
             }
         }
         return true;
     }
-    public int[] convertPos(char c, int y){
-        int x=c-'A';
-        y--;
-        if(x<0||x>7||y<0||y>7) throw new RuntimeException();
-        return new int[] {x,y};
+    public String convertPos(int[] pos){
+        return "["+letters[pos[0]]+","+(pos[1]+1)+"]";
     }
     public boolean isInCheck(boolean isWhite){
         int[]dest = findKingLoc(isWhite);
@@ -161,7 +156,7 @@ public class Board {
         for(Integer[] x : attackers){
             int[] pos = new int[]{x[0],x[1]};
             Piece piece = query(pos);
-            if(piece.canAttack(pos,dest,false)) return true;
+            if(piece.canMove(dest,false)) return true;
         }
         return false;
     }
@@ -201,7 +196,7 @@ public class Board {
         ArrayList<Integer[]> attackers = getPieces(!isWhite);
         for(Integer[] p : attackers){
             int[] pos = new int[]{p[0],p[1]};
-            if(query(pos).canAttack(pos,dest,withSafety)) res.add(p);
+            if(query(pos).canMove(dest,withSafety)||(dest[1]==pos[1]&&existsEnPassant(pos,new int[]{dest[0],dest[1]+(isWhite ? 1 : -1)})!=null)) res.add(p);
         }
         return res;
     }
@@ -248,10 +243,52 @@ public class Board {
     }
     public void set(Piece piece, int x, int y){
         board.get(7-y).set(x,piece);
+        if(piece==null) return;
+        piece.position[0]=x;
+        piece.position[1]=y;
     }
     public boolean isCardinal(int[] pos, int[] dest){
         int x = Math.abs(pos[0]-dest[0]), y = Math.abs(pos[1]-dest[1]);
         return (y!=0||x!=0)&&(y==0||x==0||y==x);
+    }
+    /**
+     *
+     * @param kingPos kings position
+     * @param kingDest kings destination
+     * @return rook destination after making a castle with the inputted move or null if castle does not exist
+     */
+    public int[] existsCastle(int[] kingPos, int[] kingDest){
+        int x = kingDest[0]-kingPos[0];
+        Piece king = query(kingPos);
+        if(!king.getName().equals("King")||((King) king).hasMoved||king.isWhite!=whiteTurn) return null;
+        Piece rook = query(x<0 ? 0 : 7,kingDest[1]);
+        if(rook==null||!rook.getName().equals("Rook")||((Rook) rook).hasMoved()) return null;
+        x=kingPos[0];
+        int tx=x;
+        while(x!=kingDest[0]){
+            x+= kingDest[0]>x ? 1 : -1;
+            if(isInCheck(king.isWhite)) break;
+            if(query(x,kingDest[1])!=null) break;
+            set(pop(king.position),x,king.position[1]);
+        }
+        boolean flag=(x!=kingDest[0]||isInCheck(king.isWhite));
+        set(pop(king.position),tx,kingPos[1]);
+        return  flag ? null : new int[]{kingDest[0] + (kingDest[0]<king.position[0] ? 1 : -1), kingDest[1]};
+    }
+    /**
+     * @param pawnPos pos of this pawn
+     * @param pawnDest destination this pawn is moving to
+     * @return the pawnDest of the opposing pawn that gets attacked if their exists an enPassant else null
+     */
+    public int[] existsEnPassant(int[] pawnPos, int[] pawnDest){
+        if(Board.outOfBounds(pawnDest)) return null;
+        int x = Math.abs(pawnPos[0]-pawnDest[0]), y = Math.abs(pawnPos[1]-pawnDest[1]);
+        if(x!=1&&y!=1||query(pawnDest)!=null) return null;
+        Piece pawn = query(pawnPos);
+        if(!pawn.getName().equals("Pawn")||pawn.isWhite!=whiteTurn) return null;
+        int[] enPass = new int[]{pawnDest[0],pawnPos[1]};
+        Piece p = query(enPass);
+        return (p!=null&&p.isWhite!=pawn.isWhite&&p.getName().equals("Pawn")&&((((Pawn) p).charged))) ? enPass : null;
     }
     public boolean canMoveCardinally(int[] pos, int[] dest){
         if(!isCardinal(pos,dest)) return false;
@@ -268,9 +305,10 @@ public class Board {
     public ArrayList<Integer[]> getMoves(int[] pos){
         ArrayList<Integer[]> res = new ArrayList<>();
         Piece p = query(pos);
+        if(p==null) return res;
         for(int y=0; y<8; y++){
             for(int x=0; x<8; x++){
-                if(p.canMove(pos, new int[]{x,y},true)) res.add(new Integer[]{x,y});
+                if(p.canMove(new int[]{x,y},true)) res.add(new Integer[]{x,y});
             }
         }
         return res;

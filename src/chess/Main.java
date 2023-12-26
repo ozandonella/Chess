@@ -5,10 +5,14 @@ import java.util.Scanner;
 public class Main {
     public static String[][] whitePieces;
     public static String[][] blackPieces;
+    static final String[] testFiles = new String[]{
+            "jinshiVsDingLiren.txt",
+            "topalovVsGary.txt"
+    };
     public static void main(String[] args) {
-        Board b = new Board(13, 5);
+        Board b = new Board(9, 3);
         b.populate();
-        b.play("jinshiVsDingLiren.txt");
+        b.play("topalovVsGary.txt");
         /*b.board.get(0).get(4).move(new int[]{2,5});
         System.out.println();
         b.board.get(7).get(4).move(new int[]{0,2});*/

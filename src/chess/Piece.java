@@ -1,20 +1,23 @@
 package chess;
 
+import java.util.Arrays;
+
 public abstract class Piece{
     private final String name;
     public final boolean isWhite;
     protected final Board board;
+    public int[] position;
 
     public Piece(String name, boolean isWhite, Board board){
+        position=new int[2];
         this.board=board;
         this.name=name;
         this.isWhite=isWhite;
     }
-    public abstract void makeMove(int[] pos, int[] dest);
-    public abstract boolean canMove(int[] pos, int[] dest, boolean withSafety);
-    public abstract boolean canAttack(int[] pos, int[] dest, boolean withSafety);
+    public abstract void makeMove(int[] dest);
+    public abstract boolean canMove(int[] dest, boolean withSafety);
     public String toString(){
-        return (isWhite ? "White " : "Black ") + name;
+        return (isWhite ? "White " : "Black ") + name +" at "+ board.convertPos(position);
     }
     public String getName(){
         return name;
