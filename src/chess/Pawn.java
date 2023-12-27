@@ -5,20 +5,20 @@ import java.util.Arrays;
 public class Pawn extends Piece{
     public boolean charged;
     private Integer turnMoved;
-    public Pawn(String name, boolean isWhite, Board board) {
-        super(name, isWhite, board);
+    public Pawn(String name, boolean isWhite) {
+        super(name, isWhite);
         charged=false;
     }
 
     @Override
-    public void makeMove(int[] dest) {
+    public void makeMove(int[] dest, Board board) {
         if(position[0]!=dest[0]&&board.query(dest)==null) board.pop(dest[0], position[1]);
         board.set(board.pop(position),dest);
         if(turnMoved==null) turnMoved=board.moveCount;
         charged = board.moveCount==turnMoved&&Math.abs(position[1]-dest[1])==2;
     }
     @Override
-    public boolean canMove(int[] dest, boolean withSafety) {
+    public boolean canMove(int[] dest, Board board, boolean withSafety) {
         if(board.query(position)==null||!board.query(position).equals(this)) throw new RuntimeException("piece location error: piece-> "+this+" location-> "+Arrays.toString(dest));
         if(position[1]==dest[1]||(isWhite && position[1]>dest[1]) || (!isWhite &&position[1]<dest[1])) return false;
         int x = Math.abs(position[0]-dest[0]), y = Math.abs(position[1]-dest[1]);

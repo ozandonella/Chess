@@ -3,12 +3,12 @@ import java.util.Arrays;
 
 public class King extends Piece{
     public boolean hasMoved;
-    public King(String name, boolean isWhite, Board board) {
-        super(name, isWhite, board);
+    public King(String name, boolean isWhite) {
+        super(name, isWhite);
         hasMoved=false;
     }
     @Override
-    public void makeMove(int[] dest) {
+    public void makeMove(int[] dest, Board board) {
         int x = dest[0]-position[0];
         hasMoved=true;
         if(Math.abs(x)==2){
@@ -21,7 +21,7 @@ public class King extends Piece{
     }
 
     @Override
-    public boolean canMove(int[] dest, boolean withSafety) {
+    public boolean canMove(int[] dest, Board board, boolean withSafety) {
         if(board.query(this.position)==null||!board.query(this.position).equals(this)) throw new RuntimeException("piece location error: piece-> "+this+" location-> "+ Arrays.toString(dest));
         int x = Math.abs(position[0]-dest[0]), y = Math.abs(position[1]-dest[1]);
         if(y>1||x>2||(x==2&&y!=0)) return false;

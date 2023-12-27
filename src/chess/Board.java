@@ -31,26 +31,26 @@ public class Board {
     public void populate(){
         for(int y=0; y<8; y++){
             if(y==0){
-                set(new Rook("Rook", true, this),0,y);
-                set(new Horse("Horse", true, this),1,y);
-                set(new Bishop("Bishop", true, this),2,y);
-                set(new Queen("Queen", true, this),3,y);
-                set(new King("King", true, this),4,y);
-                set(new Bishop("Bishop", true, this),5,y);
-                set(new Horse("Horse", true, this),6,y);
-                set(new Rook("Rook", true, this),7,y);
+                set(new Rook("Rook", true),0,y);
+                set(new Horse("Horse", true),1,y);
+                set(new Bishop("Bishop", true),2,y);
+                set(new Queen("Queen", true),3,y);
+                set(new King("King", true),4,y);
+                set(new Bishop("Bishop", true),5,y);
+                set(new Horse("Horse", true),6,y);
+                set(new Rook("Rook", true),7,y);
             }
-            else if(y==1) for(int i=0; i<8; i++) set(new Pawn("Pawn", true, this),i,y);
-            else if(y==6) for(int i=0; i<8; i++) set(new Pawn("Pawn", false, this),i,y);
+            else if(y==1) for(int i=0; i<8; i++) set(new Pawn("Pawn", true),i,y);
+            else if(y==6) for(int i=0; i<8; i++) set(new Pawn("Pawn", false),i,y);
             else if(y==7){
-                set(new Rook("Rook", false, this),0,y);
-                set(new Horse("Horse", false, this),1,y);
-                set(new Bishop("Bishop", false, this),2,y);
-                set(new Queen("Queen", false, this),3,y);
-                set(new King("King", false, this),4,y);
-                set(new Bishop("Bishop", false, this),5,y);
-                set(new Horse("Horse", false, this),6,y);
-                set(new Rook("Rook", false, this),7,y);
+                set(new Rook("Rook", false),0,y);
+                set(new Horse("Horse", false),1,y);
+                set(new Bishop("Bishop", false),2,y);
+                set(new Queen("Queen", false),3,y);
+                set(new King("King", false),4,y);
+                set(new Bishop("Bishop", false),5,y);
+                set(new Horse("Horse", false),6,y);
+                set(new Rook("Rook", false),7,y);
             }
         }
     }
@@ -102,10 +102,10 @@ public class Board {
         }
         Piece piece = query(pos[0],pos[1]);
         System.out.println("attempting: "+piece+ " -> "+convertPos(dest));
-        if (piece!=null&&piece.isWhite==isWhite&&piece.canMove(dest,true)){
+        if (piece!=null&&piece.isWhite==isWhite&&piece.canMove(dest, this, true)){
             fillSquare('=',pos);
             for (Integer [] m : getMoves(pos)) fillSquare(':',new int[]{m[0],m[1]});
-            piece.makeMove(dest);
+            piece.makeMove(dest, this);
             System.out.println("Move Successful!");
             print();
             moveCount++;
@@ -126,7 +126,7 @@ public class Board {
             if(y>7||y<0) continue;
             for(int x=dest[0]-1; x<dest[0]+2; x++){
                 if(x>7||x<0||(x==dest[0]&&y==dest[1])) continue;
-                boolean safe = query(dest).canMove(new int[]{x,y},true);
+                boolean safe = query(dest).canMove(new int[]{x,y},this, true);
                 if(safe) return false;
             }
         }
@@ -142,12 +142,12 @@ public class Board {
             tLoc[1]+=tLoc[1]<dest[1] ? 1 : -1;
             for(Integer[] p : getPieces(isWhite)){
                 int[] dLoc=new int[]{p[0],p[1]};
-                if(query(p).canMove(dLoc, true)) return false;
+                if(query(p).canMove(dLoc, this, true)) return false;
             }
         }
         return true;
     }
-    public String convertPos(int[] pos){
+    public static String convertPos(int[] pos){
         return "["+letters[pos[0]]+","+(pos[1]+1)+"]";
     }
     public boolean isInCheck(boolean isWhite){
@@ -156,7 +156,7 @@ public class Board {
         for(Integer[] x : attackers){
             int[] pos = new int[]{x[0],x[1]};
             Piece piece = query(pos);
-            if(piece.canMove(dest,false)) return true;
+            if(piece.canMove(dest,this, false)) return true;
         }
         return false;
     }
@@ -196,7 +196,7 @@ public class Board {
         ArrayList<Integer[]> attackers = getPieces(!isWhite);
         for(Integer[] p : attackers){
             int[] pos = new int[]{p[0],p[1]};
-            if(query(pos).canMove(dest,withSafety)||(dest[1]==pos[1]&&existsEnPassant(pos,new int[]{dest[0],dest[1]+(isWhite ? 1 : -1)})!=null)) res.add(p);
+            if(query(pos).canMove(dest,this, withSafety)||(dest[1]==pos[1]&&existsEnPassant(pos,new int[]{dest[0],dest[1]+(isWhite ? 1 : -1)})!=null)) res.add(p);
         }
         return res;
     }
@@ -308,7 +308,7 @@ public class Board {
         if(p==null) return res;
         for(int y=0; y<8; y++){
             for(int x=0; x<8; x++){
-                if(p.canMove(new int[]{x,y},true)) res.add(new Integer[]{x,y});
+                if(p.canMove(new int[]{x,y},this, true)) res.add(new Integer[]{x,y});
             }
         }
         return res;

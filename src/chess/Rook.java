@@ -4,16 +4,16 @@ import java.util.Arrays;
 
 public class Rook extends Piece{
     public boolean hasMoved;
-    public Rook(String name, boolean isWhite, Board board) {
-        super(name, isWhite, board);
+    public Rook(String name, boolean isWhite) {
+        super(name, isWhite);
         hasMoved=false;
     }
     @Override
-    public void makeMove(int[] dest) {
+    public void makeMove(int[] dest, Board board) {
         board.set(board.pop(position),dest);
     }
     @Override
-    public boolean canMove(int[] dest, boolean withSafety) {
+    public boolean canMove(int[] dest, Board board, boolean withSafety) {
         if(board.query(this.position)==null||!board.query(this.position).equals(this)) throw new RuntimeException("piece location error: piece-> "+this+" location-> "+ Arrays.toString(dest));
         if(position[0]!=dest[0]&&position[1]!=dest[1]) return false;
         if(!board.canMoveCardinally(position,dest)) return false;
