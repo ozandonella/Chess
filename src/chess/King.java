@@ -15,6 +15,7 @@ public class King extends Piece{
             int[] rookPos = new int[]{x<0 ? 0 : 7, dest[1]};
             int[] rookDest = new int[]{dest[0] + (x<0 ? 1 : -1), dest[1]};
             board.set(board.pop(rookPos),rookDest);
+            ((Rook)board.query(rookDest)).hasMoved=true;
         }
         board.set(board.pop(position),dest);
     }

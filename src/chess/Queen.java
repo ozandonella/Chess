@@ -10,7 +10,6 @@ public class Queen extends Piece{
     public void makeMove(int[] dest) {
         board.set(board.pop(position),dest);
     }
-
     @Override
     public boolean canMove(int[] dest, boolean withSafety) {
         if(board.query(this.position)==null||!board.query(this.position).equals(this)) throw new RuntimeException("piece location error: piece-> "+this+" location-> "+ Arrays.toString(dest));
