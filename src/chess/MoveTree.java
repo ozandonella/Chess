@@ -12,9 +12,14 @@ public class MoveTree{
         current=null;
     }
     public void addMove(MoveNode node){
-        if(current!=null) current.next.add(node);
-        else head = node;
-        current=node;
+        if(current!=null){
+            current.next.add(node);
+            node.prev=current;
+        }
+        else{
+            head = node;
+            current=head;
+        }
     }
     public void prev(){
         if(current==head) return;
@@ -22,7 +27,7 @@ public class MoveTree{
     }
     public void next(){
         if(current==null||current.next.isEmpty()) return;
-        else if(current.next.size()==1) current=current.next.get(0);
+        if(current.next.size()==1) current=current.next.get(0);
         else{
             System.out.println("Choose Move Path");
             try {
@@ -41,6 +46,5 @@ public class MoveTree{
                 System.out.println("File Issue");
             }
         }
-
     }
 }

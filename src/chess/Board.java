@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Board {
+    public MoveTree moveTree;
     public ArrayList<ArrayList<Piece>> board;
     public static final char[] letters = new char[]{'A','B','C','D','E','F','G','H'};
     public static final char[] numbers = new char[]{'1','2','3','4','5','6','7','8'};
@@ -14,6 +15,7 @@ public class Board {
     public Screen screen;
     private int Y;
     private int X;
+    private int moveReq;
     public Board(int X, int Y){
         this.X=X;
         this.Y=Y;
@@ -22,6 +24,8 @@ public class Board {
         whiteWon=null;
         whiteTurn=true;
         board=new ArrayList<>(8);
+        moveTree=new MoveTree();
+        moveReq=0;
         while(board.size()<8){
             ArrayList<Piece> insert = new ArrayList<>();
             while (insert.size()<8) insert.add(null);
@@ -67,6 +71,38 @@ public class Board {
         }
         System.out.println(whiteWon ? "White " : "Black "+ "Wins!");
     }
+    public void test(String address) {
+        Scanner s;
+        try{
+            s = new Scanner(Paths.get(address));
+        }catch (Exception e){
+            System.out.println("error");
+            return;
+        }
+        s.useDelimiter("\n");
+        while(s.hasNext()) {
+            while(true){
+                try {
+                    Scanner user = new Scanner(System.in);
+                    System.out.println("\"b\": back");
+                    System.out.println("[ENTER]: forward");
+                    if(user.nextLine().equals("b")) moveBackward();
+                    else if(moveTree.current!=null&&!moveTree.current.next.isEmpty()) moveForward();
+                    else break;
+                    print();
+                    System.out.println();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+            String in = s.nextLine();
+            movePiece(new int[] {in.charAt(0)-'A',in.charAt(1)-'1'}, new int[] {in.charAt(2)-'A',in.charAt(3)-'1'},whiteTurn);
+            whiteTurn=moveCount%2==0;
+        }
+        print();
+        System.out.println();
+        System.out.println(whiteWon ? "White " : "Black "+ "Wins!");
+    }
     public void play(String address) {
         Scanner s;
         try{
@@ -78,16 +114,6 @@ public class Board {
         s.useDelimiter("\n");
         while(s.hasNext()) {
             String in = s.nextLine();
-            while(true) {
-                try {
-                    if(in.length()!=4) throw new Exception();
-                    break;
-                }
-                catch(Exception e) {
-                    System.out.println("Invalid input");
-                    s.next();
-                }
-            }
             movePiece(new int[] {in.charAt(0)-'A',in.charAt(1)-'1'}, new int[] {in.charAt(2)-'A',in.charAt(3)-'1'},whiteTurn);
             whiteTurn=moveCount%2==0;
         }
@@ -105,7 +131,8 @@ public class Board {
         if (piece!=null&&piece.isWhite==isWhite&&piece.canMove(dest, this, true)){
             fillSquare('=',pos);
             for (Integer [] m : getMoves(pos)) fillSquare(':',new int[]{m[0],m[1]});
-            piece.makeMove(dest, this);
+            moveTree.addMove(piece.generateMove(dest, this));
+            moveForward();
             System.out.println("Move Successful!");
             print();
             moveCount++;
@@ -118,6 +145,16 @@ public class Board {
             throw new RuntimeException("Move failed");
         }
 
+    }
+    public void moveForward(){
+        if(!moveTree.current.current.isEmpty()&&query(moveTree.current.current.get(0).position)==(moveTree.current.current.get(0)))moveTree.next();
+        for(Piece p : moveTree.current.former) set(null,p.position);
+        for (Piece p : moveTree.current.current) set(p,p.position);
+    }
+    public void moveBackward(){
+        if(!moveTree.current.former.isEmpty()&&query(moveTree.current.former.get(0).position)==(moveTree.current.former.get(0)))moveTree.prev();
+        for (Piece p : moveTree.current.current) set(null,p.position);
+        for(Piece p : moveTree.current.former) set(p,p.position);
     }
     public boolean isMate(boolean isWhite){
         if(!isInCheck(isWhite)) return false;

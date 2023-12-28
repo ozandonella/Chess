@@ -10,7 +10,7 @@ public abstract class Piece{
         this.name=name;
         this.isWhite=isWhite;
     }
-    public abstract void makeMove(int[] dest, Board board);
+    public abstract MoveNode generateMove(int[] dest, Board board);
     public abstract boolean canMove(int[] dest, Board board, boolean withSafety);
     public String toString(){
         return (isWhite ? "White " : "Black ") + name +" at " + Board.convertPos(position);

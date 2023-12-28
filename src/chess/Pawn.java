@@ -11,11 +11,18 @@ public class Pawn extends Piece{
     }
 
     @Override
-    public void makeMove(int[] dest, Board board) {
-        if(position[0]!=dest[0]&&board.query(dest)==null) board.pop(dest[0], position[1]);
-        board.set(board.pop(position),dest);
-        if(turnMoved==null) turnMoved=board.moveCount;
-        charged = board.moveCount==turnMoved&&Math.abs(position[1]-dest[1])==2;
+    public MoveNode generateMove(int[] dest, Board board) {
+        MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
+        move.former.add(this);
+        if(board.query(dest)!=null) move.former.add(board.query(dest));
+        Pawn current = new Pawn(getName(),isWhite);
+        if(current.turnMoved==null) current.turnMoved=board.moveCount;
+        current.charged = board.moveCount==current.turnMoved&&Math.abs(position[1]-dest[1])==2;
+        current.position[0]=dest[0];
+        current.position[1]=dest[1];
+        move.current.add(current);
+        if(position[0]!=dest[0]&&board.query(dest)==null) move.former.add(board.query(dest[0], position[1]));
+        return move;
     }
     @Override
     public boolean canMove(int[] dest, Board board, boolean withSafety) {

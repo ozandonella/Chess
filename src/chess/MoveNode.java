@@ -10,6 +10,7 @@ public class MoveNode {
     public String name;
     public MoveNode(String name){
         this.name=name;
+        next=new ArrayList<>();
         current=new ArrayList<>();
         former=new ArrayList<>();
     }

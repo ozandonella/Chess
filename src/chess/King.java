@@ -8,16 +8,26 @@ public class King extends Piece{
         hasMoved=false;
     }
     @Override
-    public void makeMove(int[] dest, Board board) {
+    public MoveNode generateMove(int[] dest, Board board) {
         int x = dest[0]-position[0];
-        hasMoved=true;
+        MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
+        move.former.add(this);
+        if(board.query(dest)!=null) move.former.add(board.query(dest));
+        King current = new King(getName(),isWhite);
+        current.position[0]=dest[0];
+        current.position[1]=dest[1];
+        current.hasMoved=true;
+        move.current.add(current);
         if(Math.abs(x)==2){
-            int[] rookPos = new int[]{x<0 ? 0 : 7, dest[1]};
-            int[] rookDest = new int[]{dest[0] + (x<0 ? 1 : -1), dest[1]};
-            board.set(board.pop(rookPos),rookDest);
-            ((Rook)board.query(rookDest)).hasMoved=true;
+            Rook fRook = ((Rook)board.query(new int[]{x<0 ? 0 : 7, dest[1]}));
+            Rook cRook =  new Rook(fRook.getName(),fRook.isWhite);
+            cRook.position[0]=dest[0] + (x<0 ? 1 : -1);
+            cRook.position[1]=dest[1];
+            cRook.hasMoved=true;
+            move.former.add(fRook);
+            move.current.add(cRook);
         }
-        board.set(board.pop(position),dest);
+        return move;
     }
 
     @Override
