@@ -29,7 +29,8 @@ public class Pawn extends Piece{
         if(board.query(position)==null||!board.query(position).equals(this)) throw new RuntimeException("piece location error: piece-> "+this+" location-> "+Arrays.toString(dest));
         if(position[1]==dest[1]||(isWhite && position[1]>dest[1]) || (!isWhite &&position[1]<dest[1])) return false;
         int x = Math.abs(position[0]-dest[0]), y = Math.abs(position[1]-dest[1]);
-        if(y>2||x>1||(y==2&&((x!=0)||turnMoved!=null))) return false;
+        if(y>2||x>1) return false;
+        if(y==2&&(x!=0||turnMoved!=null||board.query(dest[0],isWhite ? dest[1]-1 : dest[1]+1)!=null)) return false;
         Piece piece = board.query(dest);
         if(piece!=null&&(piece.isWhite == isWhite || x != 1)) return false;
         int[] enPass = board.existsEnPassant(position,dest);

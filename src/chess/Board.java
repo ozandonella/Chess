@@ -13,9 +13,8 @@ public class Board {
     public boolean whiteTurn;
     public int moveCount;
     public Screen screen;
-    private int Y;
-    private int X;
-    private int moveReq;
+    private final int Y;
+    private final int X;
     public Board(int X, int Y){
         this.X=X;
         this.Y=Y;
@@ -25,7 +24,6 @@ public class Board {
         whiteTurn=true;
         board=new ArrayList<>(8);
         moveTree=new MoveTree();
-        moveReq=0;
         while(board.size()<8){
             ArrayList<Piece> insert = new ArrayList<>();
             while (insert.size()<8) insert.add(null);
@@ -63,13 +61,69 @@ public class Board {
         print();
         while(whiteWon==null) {
             String in = s.nextLine();
-            if(in.length()!=4){
-                System.out.println("Invalid Input");
-                continue;
+            if(in.equals("b")){
+                moveBackward();
+                print();
+                System.out.println();
             }
-            movePiece(new int[]{Character.toUpperCase(in.charAt(0)) - 'A', in.charAt(1) - '1'}, new int[]{Character.toUpperCase(in.charAt(2)) - 'A', in.charAt(3) - '1'}, whiteTurn);
+            else if(in.equals("f")){
+                moveForward(getForwardMove());
+                print();
+                System.out.println();
+            }
+            else if(in.length()!=4) System.out.println("Invalid Input");
+            else movePiece(new int[]{Character.toUpperCase(in.charAt(0)) - 'A', in.charAt(1) - '1'}, new int[]{Character.toUpperCase(in.charAt(2)) - 'A', in.charAt(3) - '1'}, whiteTurn);
+            moveTree.print();
         }
         System.out.println(whiteWon ? "White " : "Black "+ "Wins!");
+    }
+    public int getForwardMove(){
+        if(moveTree.current.next.size()<=1) return 0;
+        else{
+            System.out.println("Choose Move Path");
+            int x=-1;
+            try {
+                Scanner s = new Scanner(System.in);
+                while(x<0||x>=moveTree.current.next.size()){
+                    for(int i=0; i<moveTree.current.next.size(); i++) System.out.println("["+i+"] "+ moveTree.current.next.get(i));
+                    try {
+                        x=s.nextInt();
+                    }catch(Exception e){
+                        System.out.println("Invalid Input");
+                    }
+                }
+                return x;
+            }catch(Exception e){
+                System.out.println("File Issue");
+            }
+            return x;
+        }
+    }
+    public static int choosePromotion(){
+        System.out.println("Choose promotion");
+        int x=-1;
+        try {
+            Scanner s = new Scanner(System.in);
+            while(x<0||x>=4){
+                String name;
+                for(int i=0; i<4; i++){
+                    if(i==0) name="Horse";
+                    else if(i==1) name="Bishop";
+                    else if(i==2) name="Rook";
+                    else name="Queen";
+                    System.out.println("["+i+"] "+ name);
+                }
+                try {
+                    x=s.nextInt();
+                }catch(Exception e){
+                    System.out.println("Invalid Input");
+                }
+            }
+            return x;
+        }catch(Exception e){
+            System.out.println("File Issue");
+        }
+        return x;
     }
     public void test(String address) {
         Scanner s;
@@ -87,7 +141,7 @@ public class Board {
                     System.out.println("\"b\": back");
                     System.out.println("[ENTER]: forward");
                     if(user.nextLine().equals("b")) moveBackward();
-                    else if(moveTree.current!=null&&!moveTree.current.next.isEmpty()) moveForward();
+                    else if(moveTree.current!=null&&!moveTree.current.next.isEmpty()) moveForward(0);
                     else break;
                     print();
                     System.out.println();
@@ -117,8 +171,9 @@ public class Board {
             movePiece(new int[] {in.charAt(0)-'A',in.charAt(1)-'1'}, new int[] {in.charAt(2)-'A',in.charAt(3)-'1'},whiteTurn);
             whiteTurn=moveCount%2==0;
         }
-        print();
         System.out.println();
+        if(whiteWon==null) return;
+        print();
         System.out.println(whiteWon ? "White " : "Black "+ "Wins!");
     }
     public void movePiece(int[] pos, int[] dest, boolean isWhite){
@@ -131,30 +186,41 @@ public class Board {
         if (piece!=null&&piece.isWhite==isWhite&&piece.canMove(dest, this, true)){
             fillSquare('=',pos);
             for (Integer [] m : getMoves(pos)) fillSquare(':',new int[]{m[0],m[1]});
-            moveTree.addMove(piece.generateMove(dest, this));
-            moveForward();
+            MoveNode m;
+            if((dest[1]==0||dest[1]==7)&&piece.getName().equals("Pawn")) m=getPromotions((Pawn)piece, dest).get(choosePromotion());
+            else m = piece.generateMove(dest, this);
+            m.posHash=getHash(pos);
+            m.destHash=getHash(dest);
+            moveForward(moveTree.addMove(m));
             System.out.println("Move Successful!");
             print();
-            moveCount++;
-            whiteTurn=!whiteTurn;
             System.out.println();
-            if(isMate(!isWhite)) whiteWon=isWhite;
         }
         else {
             System.out.println("Move Failed :(");
-            throw new RuntimeException("Move failed");
+            //throw new RuntimeException("Move failed");
         }
 
     }
-    public void moveForward(){
-        if(!moveTree.current.current.isEmpty()&&query(moveTree.current.current.get(0).position)==(moveTree.current.current.get(0)))moveTree.next();
+    public void moveForward(int ind){
+        if(moveTree.current==moveTree.head||query(moveTree.current.current.get(0).position)==(moveTree.current.current.get(0))){
+            if(moveTree.current.next.isEmpty()) return;
+            moveTree.next(ind);
+        }
         for(Piece p : moveTree.current.former) set(null,p.position);
         for (Piece p : moveTree.current.current) set(p,p.position);
+        if(isMate(!whiteTurn)) whiteWon=whiteTurn;
+        whiteTurn=!whiteTurn;
+        moveCount++;
     }
     public void moveBackward(){
-        if(!moveTree.current.former.isEmpty()&&query(moveTree.current.former.get(0).position)==(moveTree.current.former.get(0)))moveTree.prev();
+        if(moveTree.current==moveTree.head) return;
+        if (query(moveTree.current.former.get(0).position)==(moveTree.current.former.get(0))) moveTree.prev();
         for (Piece p : moveTree.current.current) set(null,p.position);
         for(Piece p : moveTree.current.former) set(p,p.position);
+        whiteTurn=!whiteTurn;
+        moveCount--;
+        moveTree.prev();
     }
     public boolean isMate(boolean isWhite){
         if(!isInCheck(isWhite)) return false;
@@ -186,6 +252,9 @@ public class Board {
     }
     public static String convertPos(int[] pos){
         return "["+letters[pos[0]]+","+(pos[1]+1)+"]";
+    }
+    public static int getHash(int[] pos){
+        return 8*pos[1]+pos[0];
     }
     public boolean isInCheck(boolean isWhite){
         int[]dest = findKingLoc(isWhite);
@@ -326,6 +395,25 @@ public class Board {
         int[] enPass = new int[]{pawnDest[0],pawnPos[1]};
         Piece p = query(enPass);
         return (p!=null&&p.isWhite!=pawn.isWhite&&p.getName().equals("Pawn")&&((((Pawn) p).charged))) ? enPass : null;
+    }
+    public ArrayList<MoveNode> getPromotions(Pawn p, int[] dest){
+        ArrayList<MoveNode> promotions = new ArrayList<>();
+        Piece cap = query(dest);
+        for(int x=0; x<4; x++){
+            MoveNode move = new MoveNode(p + " -> "+Board.convertPos(dest));
+            Piece piece;
+            move.former.add(p);
+            if(cap!=null) move.former.add(cap);
+            if(x==0) piece=new Horse("Horse", p.isWhite);
+            else if(x==1) piece=new Bishop("Bishop", p.isWhite);
+            else if(x==2) piece=new Rook("Rook", p.isWhite);
+            else piece=new Queen("Queen", p.isWhite);
+            piece.position=dest;
+            move.current.add(piece);
+            move.name+="("+move.current.get(0).getName()+")";
+            promotions.add(move);
+        }
+        return promotions;
     }
     public boolean canMoveCardinally(int[] pos, int[] dest){
         if(!isCardinal(pos,dest)) return false;
