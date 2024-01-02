@@ -65,23 +65,27 @@ public class Board {
     public void play(){
         Scanner s = new Scanner(System.in);
         print();
+        Bot bot = new Bot(this);
         while(gameState==0) {
-            String in = s.nextLine();
-            if(in.equals("b")){
-                moveBackward();
-                print();
-                System.out.println();
+            if(!whiteTurn) {
+                String in = s.nextLine();
+                if(in.equals("b")){
+                    moveBackward();
+                    print();
+                    System.out.println();
+                }
+                else if(in.equals("f")){
+                    moveForward(chooseMovePath());
+                    print();
+                    System.out.println();
+                }
+                else if(in.length()!=4) System.out.println("Invalid Input");
+                else movePiece(new int[]{Character.toUpperCase(in.charAt(0)) - 'A', in.charAt(1) - '1'}, new int[]{Character.toUpperCase(in.charAt(2)) - 'A', in.charAt(3) - '1'}, whiteTurn);
             }
-            else if(in.equals("f")){
-                moveForward(chooseMovePath());
+            else{
+                moveForward(moveTree.addMove(bot.findBestLine(4).head.next.get(0)));
                 print();
-                System.out.println();
             }
-            else if(in.length()!=4) System.out.println("Invalid Input");
-            else movePiece(new int[]{Character.toUpperCase(in.charAt(0)) - 'A', in.charAt(1) - '1'}, new int[]{Character.toUpperCase(in.charAt(2)) - 'A', in.charAt(3) - '1'}, whiteTurn);
-            moveTree.print();
-            System.out.println(whitePieces);
-            System.out.println(blackPieces);
         }
         if(gameState==1) System.out.println("White Wins!");
         else if(gameState==2) System.out.println("Black Wins!");
@@ -260,7 +264,7 @@ public class Board {
         ArrayList<Piece> attackers=getAllAttacking(king.position,!isWhite,false);
         if(attackers.size()>1) return true;
         Piece attacker = attackers.get(0);
-        ArrayList<Piece> counters = getAllAttacking(attacker.position,!isWhite,true);
+        ArrayList<Piece> counters = getAllAttacking(attacker.position,isWhite,true);
         if(!counters.isEmpty()) return false;
         if(attacker.getName().equals("Horse")) return true;
         int[] temp=new int[]{attacker.position[0],attacker.position[1]};
@@ -286,7 +290,7 @@ public class Board {
     }
     public ArrayList<Piece> getAllAttacking(int[] dest, boolean isWhite, boolean withSafety){
         ArrayList<Piece> res = new ArrayList<>();
-        ArrayList<Piece> attackers = isWhite ? whitePieces : blackPieces;
+        ArrayList<Piece> attackers = new ArrayList<>(isWhite ? whitePieces : blackPieces);
         for(Piece p : attackers){
             if(p.canMove(dest,this, withSafety)||(dest[1]==p.position[1]&&existsEnPassant(p.position,new int[]{dest[0],dest[1]+(isWhite ? 1 : -1)})!=null)) res.add(p);
         }
@@ -355,27 +359,32 @@ public class Board {
     }
     /**
      *
-     * @param kingPos kings position
+     * @param king king that is castleing
      * @param kingDest kings destination
      * @return rook destination after making a castle with the inputted move or null if castle does not exist
      */
-    public int[] existsCastle(int[] kingPos, int[] kingDest){
-        int x = kingDest[0]-kingPos[0];
-        Piece king = query(kingPos);
-        if(!king.getName().equals(King.name)||((King) king).hasMoved||king.isWhite!=whiteTurn) return null;
-        Piece rook = query(x<0 ? 0 : 7,kingDest[1]);
+    public int[] existsCastle(King king, int[] kingDest){
+        int x = kingDest[0]-king.position[0];
+        if(king.hasMoved||king.isWhite!=whiteTurn) return null;
+        boolean castleRight=x>0;
+        Piece rook = query(castleRight ? 7 : 0,kingDest[1]);
         if(rook==null||!rook.getName().equals(Rook.name)||((Rook) rook).hasMoved()) return null;
-        x=kingPos[0];
-        int tx=x;
-        while(x!=kingDest[0]){
-            x+= kingDest[0]>x ? 1 : -1;
-            if(isInCheck(king.isWhite)) break;
-            if(query(x,kingDest[1])!=null) break;
-            set(pop(king.position),x,king.position[1]);
+        int tx=king.position[0];
+        x=king.position[0]+(castleRight?1:-1);
+        while(x!=rook.position[0]){
+            if(query(x,king.position[1])!=null) return null;
+            x+=castleRight?1:-1;
         }
-        boolean flag=(x!=kingDest[0]||isInCheck(king.isWhite));
-        set(pop(king.position),tx,kingPos[1]);
-        return  flag ? null : new int[]{kingDest[0] + (kingDest[0]<king.position[0] ? 1 : -1), kingDest[1]};
+        x=king.position[0];
+        boolean flag=isInCheck(king.isWhite);
+        while(!flag&&x!=kingDest[0]){
+            x+=castleRight?1:-1;
+            set(pop(king.position),x,king.position[1]);
+            if(isInCheck(king.isWhite))flag=true;
+        }
+        pop(king.position);
+        set(king,tx,king.position[1]);
+        return  flag ? null : new int[]{kingDest[0] + (castleRight ? -1 : 1), kingDest[1]};
     }
     /**
      * @param pawnPos pos of this pawn

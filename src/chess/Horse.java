@@ -6,6 +6,7 @@ public class Horse extends Piece{
     public static final String name="Horse";
     public Horse(boolean isWhite) {
         super(isWhite);
+        pointValue=3;
         super.name=name;
     }
 

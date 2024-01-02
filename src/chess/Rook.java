@@ -9,6 +9,7 @@ public class Rook extends Piece{
     public Rook(boolean isWhite) {
         super(isWhite);
         super.name=name;
+        pointValue=5;
         hasMoved=false;
     }
     @Override

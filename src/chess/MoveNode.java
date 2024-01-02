@@ -8,6 +8,7 @@ public class MoveNode {
     public ArrayList<MoveNode> next;
     public MoveNode prev;
     public String name;
+    public int value;
     public int posHash;
     public int destHash;
     public MoveNode(String name){
@@ -40,7 +41,7 @@ public class MoveNode {
         return next.get(0).getLine(line+", ");
     }
     public String toString(){
-        return name+" ("+posHash+","+destHash+")";
+        return name+" ("+posHash+","+destHash+") "+value;
     }
 
 }

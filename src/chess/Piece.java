@@ -4,10 +4,12 @@ public abstract class Piece{
     public String name;
     public final boolean isWhite;
     public int[] position;
+    public int pointValue;
 
     public Piece(boolean isWhite){
         position=new int[2];
         this.isWhite=isWhite;
+        pointValue=0;
     }
     public abstract MoveNode generateMove(int[] dest, Board board);
     public abstract boolean canMove(int[] dest, Board board, boolean withSafety);

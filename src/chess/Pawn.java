@@ -9,6 +9,7 @@ public class Pawn extends Piece{
     public Pawn(boolean isWhite) {
         super(isWhite);
         super.name=name;
+        pointValue=1;
         charged=false;
     }
 

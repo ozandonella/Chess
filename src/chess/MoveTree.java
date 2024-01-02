@@ -1,4 +1,7 @@
 package chess;
+
+import java.util.ArrayList;
+
 public class MoveTree{
     public MoveNode head;
     public MoveNode current;

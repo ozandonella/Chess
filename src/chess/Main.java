@@ -10,12 +10,14 @@ public class Main {
             "topalovVsGary.txt",
             "promotionTest.txt",
             "staleMateTest.txt",
-            "CarlsenVsErnst.txt"
+            "CarlsenVsErnst.txt",
+            "botTest1.txt"
     };
     public static void main(String[] args) {
         Board b = new Board(9, 3);
         b.populate();
-        b.play(testFiles[4]);
+        b.play();
+        //System.out.println(bot.evalBoard());
         /*b.board.get(0).get(4).move(new int[]{2,5});
         System.out.println();
         b.board.get(7).get(4).move(new int[]{0,2});*/

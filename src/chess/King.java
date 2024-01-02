@@ -41,7 +41,7 @@ public class King extends Piece{
         int[] rookDest = null;
         if(x==2){
             rookPos = dest[0] < position[0] ? new int[]{0,position[1]} : new int[]{7,position[1]};
-            rookDest = board.existsCastle(position, dest);
+            rookDest = board.existsCastle(this, dest);
             if(rookDest==null) return false;
         }
         else if(board.query(dest)!=null&&board.query(dest).isWhite==isWhite) return false;

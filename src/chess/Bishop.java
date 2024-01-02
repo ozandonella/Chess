@@ -6,6 +6,7 @@ public class Bishop extends Piece{
     public static final String name="Bishop";
     public Bishop(boolean isWhite) {
         super(isWhite);
+        pointValue=3;
         super.name=name;
     }
     @Override

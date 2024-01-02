@@ -5,6 +5,7 @@ public class Queen extends Piece{
     public static final String name="Queen";
     public Queen(boolean isWhite) {
         super(isWhite);
+        pointValue=9;
         super.name=name;
     }
 
