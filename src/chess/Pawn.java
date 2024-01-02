@@ -3,10 +3,12 @@ package chess;
 import java.util.Arrays;
 
 public class Pawn extends Piece{
+    public static final String name="Pawn";
     public boolean charged;
     private Integer turnMoved;
-    public Pawn(String name, boolean isWhite) {
-        super(name, isWhite);
+    public Pawn(boolean isWhite) {
+        super(isWhite);
+        super.name=name;
         charged=false;
     }
 
@@ -15,7 +17,7 @@ public class Pawn extends Piece{
         MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
         move.former.add(this);
         if(board.query(dest)!=null) move.former.add(board.query(dest));
-        Pawn current = new Pawn(getName(),isWhite);
+        Pawn current = new Pawn(isWhite);
         if(current.turnMoved==null) current.turnMoved=board.moveCount;
         current.charged = board.moveCount==current.turnMoved&&Math.abs(position[1]-dest[1])==2;
         current.position[0]=dest[0];
@@ -46,5 +48,4 @@ public class Pawn extends Piece{
         board.set(piece,dest);
         return !inCheck;
     }
-
 }

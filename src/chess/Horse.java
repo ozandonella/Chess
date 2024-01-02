@@ -3,8 +3,10 @@ package chess;
 import java.util.Arrays;
 
 public class Horse extends Piece{
-    public Horse(String name, boolean isWhite) {
-        super(name, isWhite);
+    public static final String name="Horse";
+    public Horse(boolean isWhite) {
+        super(isWhite);
+        super.name=name;
     }
 
     @Override
@@ -12,7 +14,7 @@ public class Horse extends Piece{
         MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
         move.former.add(this);
         if(board.query(dest)!=null) move.former.add(board.query(dest));
-        Horse current = new Horse(getName(),isWhite);
+        Horse current = new Horse(isWhite);
         current.position[0]=dest[0];
         current.position[1]=dest[1];
         move.current.add(current);

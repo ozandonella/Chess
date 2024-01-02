@@ -8,12 +8,14 @@ public class Main {
     static final String[] testFiles = new String[]{
             "jinshiVsDingLiren.txt",
             "topalovVsGary.txt",
-            "promotionTest.txt"
+            "promotionTest.txt",
+            "staleMateTest.txt",
+            "CarlsenVsErnst.txt"
     };
     public static void main(String[] args) {
         Board b = new Board(9, 3);
         b.populate();
-        b.play();
+        b.play(testFiles[4]);
         /*b.board.get(0).get(4).move(new int[]{2,5});
         System.out.println();
         b.board.get(7).get(4).move(new int[]{0,2});*/

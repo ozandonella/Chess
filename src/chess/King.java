@@ -2,9 +2,11 @@ package chess;
 import java.util.Arrays;
 
 public class King extends Piece{
+    public static final String name="King";
     public boolean hasMoved;
-    public King(String name, boolean isWhite) {
-        super(name, isWhite);
+    public King(boolean isWhite) {
+        super(isWhite);
+        super.name=name;
         hasMoved=false;
     }
     @Override
@@ -13,14 +15,14 @@ public class King extends Piece{
         MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
         move.former.add(this);
         if(board.query(dest)!=null) move.former.add(board.query(dest));
-        King current = new King(getName(),isWhite);
+        King current = new King(isWhite);
         current.position[0]=dest[0];
         current.position[1]=dest[1];
         current.hasMoved=true;
         move.current.add(current);
         if(Math.abs(x)==2){
             Rook fRook = ((Rook)board.query(new int[]{x<0 ? 0 : 7, dest[1]}));
-            Rook cRook =  new Rook(fRook.getName(),fRook.isWhite);
+            Rook cRook =  new Rook(fRook.isWhite);
             cRook.position[0]=dest[0] + (x<0 ? 1 : -1);
             cRook.position[1]=dest[1];
             cRook.hasMoved=true;

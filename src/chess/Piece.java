@@ -1,13 +1,12 @@
 package chess;
 
 public abstract class Piece{
-    private final String name;
+    public String name;
     public final boolean isWhite;
     public int[] position;
 
-    public Piece(String name, boolean isWhite){
+    public Piece(boolean isWhite){
         position=new int[2];
-        this.name=name;
         this.isWhite=isWhite;
     }
     public abstract MoveNode generateMove(int[] dest, Board board);
