@@ -12,11 +12,31 @@ public class Bot {
         ArrayList<MoveNode> moves = new ArrayList<>();
         ArrayList<Piece> pieces = new ArrayList<>(isWhite ? board.whitePieces : board.blackPieces);
         for(Piece piece : pieces){
-            for(Integer[] dest : board.getMoves(piece)){
-                MoveNode m = piece.generateMove(new int[]{dest[0],dest[1]}, board);
-                m.posHash=Board.getHash(piece.position);
-                m.destHash=Board.getHash(new int[]{dest[0],dest[1]});
-                moves.add(m);
+            for(Integer[] d : board.getMoves(piece)){
+                int[] dest = new int[]{d[0],d[1]};
+                if((dest[1]==0||dest[1]==7)&&piece.getName().equals(Pawn.name)){
+                    Piece cap = board.query(dest);
+                    for(int x=0; x<2; x++){
+                        MoveNode move = new MoveNode(piece + " -> "+Board.convertPos(dest));
+                        Piece p;
+                        move.former.add(piece);
+                        if(cap!=null) move.former.add(cap);
+                        if(x==0) p=new Horse(piece.isWhite);
+                        else p=new Queen(piece.isWhite);
+                        p.position=dest;
+                        move.current.add(p);
+                        move.posHash=Board.getHash(piece.position);
+                        move.destHash=Board.getHash(dest);
+                        move.name+="("+move.current.get(0).getName()+")";
+                        moves.add(move);
+                    }
+                }
+                else{
+                    MoveNode m = piece.generateMove(dest, board);
+                    m.posHash=Board.getHash(piece.position);
+                    m.destHash=Board.getHash(dest);
+                    moves.add(m);
+                }
             }
         }
         return moves;
@@ -49,6 +69,7 @@ public class Bot {
         board.moveTree = bestLine;
         findPath(steps);
         board.moveTree=temp;
+        bestLine.print();
         return bestLine;
     }
     public void findPath(int steps){

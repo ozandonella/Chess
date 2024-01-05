@@ -1,7 +1,6 @@
 package chess;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Board {
@@ -66,12 +65,15 @@ public class Board {
         Scanner s = new Scanner(System.in);
         print();
         System.out.println();
+        int pieceThreshold=360/15;
+        int steps=4;
         Bot bot = new Bot(this);
         while(gameState==0) {
             if(!whiteTurn) {
                 String in = s.nextLine().toUpperCase();
                 if(in.equals("B"))moveBackward();
                 else if(in.equals("F"))moveForward(chooseMovePath());
+                else if(in.equals("END")) break;
                 else if(in.length()!=4) System.out.println("Invalid Input");
                 else{
                     int[] pos = new int[] {in.charAt(0)-'A',in.charAt(1)-'1'};
@@ -83,7 +85,9 @@ public class Board {
                     moveForward(moveTree.addMove(generateMove(query(pos),dest)));
                 }
             }
-            else moveForward(moveTree.addMove(bot.findBestLine(4).head.next.get(0).copy()));
+            else {
+                moveForward(moveTree.addMove(bot.findBestLine(steps).head.next.get(0).copy()));
+            }
             fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
             fillSquare('/',new int[]{moveTree.current.destHash%8,moveTree.current.destHash/8});
             print();

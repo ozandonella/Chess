@@ -11,13 +11,16 @@ public class Main {
             "promotionTest.txt",
             "staleMateTest.txt",
             "CarlsenVsErnst.txt",
-            "botTest1.txt"
+            "botTest1.txt",
+            "PromotionBotTest.txt"
     };
     public static void main(String[] args) {
         Board b = new Board(9, 3);
         b.populate();
+        b.play(testFiles[6]);
         Bot bot= new Bot(b);
         b.playBot();
+        b.play();
         //System.out.println(bot.evalBoard());
         /*b.board.get(0).get(4).move(new int[]{2,5});
         System.out.println();
