@@ -16,7 +16,8 @@ public class Main {
     public static void main(String[] args) {
         Board b = new Board(9, 3);
         b.populate();
-        b.play();
+        Bot bot= new Bot(b);
+        b.playBot();
         //System.out.println(bot.evalBoard());
         /*b.board.get(0).get(4).move(new int[]{2,5});
         System.out.println();
@@ -55,6 +56,40 @@ public class Main {
         s.set(blackPieces[2],78,44);
         s.set(blackPieces[1],90,44);
         s.print();*/
+    }
+    public static void printTreeData(MoveTree m){
+        MoveNode t = m.head;
+        System.out.println("--------current--------");
+        System.out.println(m.current);
+        System.out.println(m.current.former);
+        System.out.println(m.current.current);
+        System.out.println("--------------------");
+        while(true){
+            System.out.println(t);
+            System.out.println(t.former);
+            System.out.println(t.current);
+            System.out.println(t.next);
+            System.out.println("---------------");
+            if(t.next.isEmpty()) break;
+            t=t.next.get(0);
+        }
+        System.out.println("--------tail--------");
+        System.out.println(t);
+        System.out.println(t.former);
+        System.out.println(t.current);
+        System.out.println("--------------------");
+        m.print();
+    }
+    public static void printData(Bot b, Board board){
+        System.out.println("BOT TREE DATA");
+        System.out.println();
+        MoveTree copy = new MoveTree();
+        //MoveTree.synch(copy,b.tree);
+        //printTreeData(b.tree);
+        System.out.println();
+        System.out.println("BOARD TREE DATA");
+        System.out.println();
+        printTreeData(board.moveTree);
     }
     public static void getPieces() throws IOException {
         Scanner s = new Scanner(Paths.get("newPieces"));

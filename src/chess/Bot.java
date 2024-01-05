@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Bot {
     private final Board board;
+    public MoveTree tree;
     public Bot(Board board){
         this.board=board;
     }
@@ -21,12 +22,24 @@ public class Bot {
         return moves;
     }
     public int evalBoard(){
-        if(board.gameState==1) return 40;
-        if(board.gameState==2) return -40;
+        if(board.gameState==1) return 400;
+        if(board.gameState==2) return -400;
         if(board.gameState==3) return 0;
+        int whiteAttackers=0;
+        int blackAttackers=0;
         int sum=0;
-        for(Piece p : board.whitePieces) sum+=p.pointValue;
-        for (Piece p : board.blackPieces) sum-=p.pointValue;
+        for(Piece p : board.whitePieces){
+            if(p.name.charAt(0)!='P'&&Math.abs(p.position[0]-board.blackKing.position[0])<4&&Math.abs(p.position[1]-board.blackKing.position[1])<4) whiteAttackers++;
+            sum+=p.getPointValue();
+        }
+        for (Piece p : board.blackPieces){
+            if(p.name.charAt(0)!='P'&&Math.abs(p.position[0]-board.whiteKing.position[0])<4&&Math.abs(p.position[1]-board.whiteKing.position[1])<4) blackAttackers++;
+            sum-=p.getPointValue();
+        }
+        if(whiteAttackers!=0)whiteAttackers=Math.max(1,whiteAttackers/2);
+        if(blackAttackers!=0)blackAttackers=Math.max(1,blackAttackers/2);
+        sum-=(blackAttackers);
+        sum+=(whiteAttackers);
         return sum;
     }
     public MoveTree findBestLine(int steps){
@@ -34,31 +47,22 @@ public class Bot {
         MoveTree temp = board.moveTree;
         MoveTree bestLine= new MoveTree();
         board.moveTree = bestLine;
-        bestLine.print();
         findPath(steps);
         board.moveTree=temp;
         return bestLine;
     }
     public void findPath(int steps){
-        if(steps==0){
+        if(steps==0||board.gameState!=0){
             board.moveTree.current.value=evalBoard();
             return;
         }
         MoveNode best = null;
-        int val=100;
+        int val=1000;
         for(MoveNode move : generateMoves(board.whiteTurn)){
             board.moveForward(board.moveTree.addMove(move));
             findPath(steps-1);
             board.moveBackward();
-            if(best==null){
-                best=move;
-                val=move.value;
-            }
-            else if(board.whiteTurn&&move.value>val){
-                best=move;
-                val=move.value;
-            }
-            else if(!board.whiteTurn&&move.value<val){
+            if(best==null||board.whiteTurn&&move.value>val||!board.whiteTurn&&move.value<val){
                 best=move;
                 val=move.value;
             }

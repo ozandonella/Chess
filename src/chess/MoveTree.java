@@ -41,6 +41,20 @@ public class MoveTree{
         for (MoveNode m : move.next) print(m);
     }*/
     public void print(){
-        head.print(0);
+        head.print("");
+    }
+    public static void synch(MoveTree tree, MoveTree synchTo){
+        ArrayList<MoveNode> mainBranch=new ArrayList<>();
+        MoveNode temp=synchTo.current;
+        while(temp!=synchTo.head){
+            mainBranch.add(temp.copy());
+            temp=temp.prev;
+        }
+        tree.current=tree.head;
+        for(int x=mainBranch.size()-1; x>=0; x--){
+            if(tree.current.next.isEmpty())tree.next(tree.addMove(mainBranch.get(x)));
+            else tree.next(tree.addMove(mainBranch.get(x)));
+        }
     }
 }
+

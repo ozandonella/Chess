@@ -6,7 +6,6 @@ public class Bishop extends Piece{
     public static final String name="Bishop";
     public Bishop(boolean isWhite) {
         super(isWhite);
-        pointValue=3;
         super.name=name;
     }
     @Override
@@ -33,5 +32,16 @@ public class Bishop extends Piece{
         board.set(board.pop(dest),tempPos);
         board.set(piece,dest);
         return !inCheck;
+    }
+
+    @Override
+    public int getPointValue() {
+        return 30;
+    }
+
+    public Piece copy() {
+        Bishop copy = new Bishop(isWhite);
+        copy.position=new int[]{position[0],position[1]};
+        return copy;
     }
 }

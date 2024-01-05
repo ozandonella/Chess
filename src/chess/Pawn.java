@@ -4,15 +4,11 @@ import java.util.Arrays;
 
 public class Pawn extends Piece{
     public static final String name="Pawn";
-    public boolean charged;
     private Integer turnMoved;
     public Pawn(boolean isWhite) {
         super(isWhite);
         super.name=name;
-        pointValue=1;
-        charged=false;
     }
-
     @Override
     public MoveNode generateMove(int[] dest, Board board) {
         MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
@@ -20,7 +16,6 @@ public class Pawn extends Piece{
         if(board.query(dest)!=null) move.former.add(board.query(dest));
         Pawn current = new Pawn(isWhite);
         if(current.turnMoved==null) current.turnMoved=board.moveCount;
-        current.charged = board.moveCount==current.turnMoved&&Math.abs(position[1]-dest[1])==2;
         current.position[0]=dest[0];
         current.position[1]=dest[1];
         move.current.add(current);
@@ -48,5 +43,21 @@ public class Pawn extends Piece{
         if(p!=null) board.set(p,enPass);
         board.set(piece,dest);
         return !inCheck;
+    }
+
+    @Override
+    public int getPointValue() {
+        return 10+(isWhite ? position[1]-1 : 6-position[1])/2;
+    }
+
+    public boolean justCharged(Board board){
+        return turnMoved!=null&&board.moveCount-1==turnMoved&&((isWhite&&position[1]==3)||!isWhite&&position[1]==4);
+    }
+    @Override
+    public Piece copy() {
+        Pawn copy = new Pawn(isWhite);
+        copy.position=new int[]{position[0],position[1]};
+        copy.turnMoved=turnMoved;
+        return copy;
     }
 }

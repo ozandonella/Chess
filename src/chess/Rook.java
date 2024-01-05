@@ -9,7 +9,6 @@ public class Rook extends Piece{
     public Rook(boolean isWhite) {
         super(isWhite);
         super.name=name;
-        pointValue=5;
         hasMoved=false;
     }
     @Override
@@ -39,7 +38,18 @@ public class Rook extends Piece{
         return !inCheck;
     }
 
+    @Override
+    public int getPointValue() {
+        return 50;
+    }
+
     public boolean hasMoved() {
         return hasMoved;
+    }
+    public Piece copy() {
+        Rook copy = new Rook(isWhite);
+        copy.hasMoved=hasMoved;
+        copy.position=new int[]{position[0],position[1]};
+        return copy;
     }
 }

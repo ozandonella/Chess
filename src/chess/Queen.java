@@ -5,7 +5,6 @@ public class Queen extends Piece{
     public static final String name="Queen";
     public Queen(boolean isWhite) {
         super(isWhite);
-        pointValue=9;
         super.name=name;
     }
 
@@ -34,4 +33,14 @@ public class Queen extends Piece{
         return !inCheck;
     }
 
+    @Override
+    public int getPointValue() {
+        return 90;
+    }
+
+    public Piece copy() {
+        Queen copy = new Queen(isWhite);
+        copy.position=new int[]{position[0],position[1]};
+        return copy;
+    }
 }

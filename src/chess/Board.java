@@ -62,30 +62,61 @@ public class Board {
             }
         }
     }
-    public void play(){
+    public void playBot(){
         Scanner s = new Scanner(System.in);
         print();
+        System.out.println();
         Bot bot = new Bot(this);
         while(gameState==0) {
             if(!whiteTurn) {
-                String in = s.nextLine();
-                if(in.equals("b")){
-                    moveBackward();
-                    print();
-                    System.out.println();
-                }
-                else if(in.equals("f")){
-                    moveForward(chooseMovePath());
-                    print();
-                    System.out.println();
-                }
+                String in = s.nextLine().toUpperCase();
+                if(in.equals("B"))moveBackward();
+                else if(in.equals("F"))moveForward(chooseMovePath());
                 else if(in.length()!=4) System.out.println("Invalid Input");
-                else movePiece(new int[]{Character.toUpperCase(in.charAt(0)) - 'A', in.charAt(1) - '1'}, new int[]{Character.toUpperCase(in.charAt(2)) - 'A', in.charAt(3) - '1'}, whiteTurn);
+                else{
+                    int[] pos = new int[] {in.charAt(0)-'A',in.charAt(1)-'1'};
+                    int[] dest = new int[] {in.charAt(2)-'A',in.charAt(3)-'1'};
+                    if(!existsMove(pos,dest,whiteTurn)){
+                        System.out.println("move at "+convertPos(pos)+" -> "+convertPos(dest)+" does not exist");
+                        continue;
+                    }
+                    moveForward(moveTree.addMove(generateMove(query(pos),dest)));
+                }
             }
+            else moveForward(moveTree.addMove(bot.findBestLine(4).head.next.get(0).copy()));
+            fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
+            fillSquare('/',new int[]{moveTree.current.destHash%8,moveTree.current.destHash/8});
+            print();
+            System.out.println();
+            moveTree.print();
+        }
+        if(gameState==1) System.out.println("White Wins!");
+        else if(gameState==2) System.out.println("Black Wins!");
+        else System.out.println("Stale Mate!");
+    }
+    public void play(){
+        Scanner s = new Scanner(System.in);
+        print();
+        while(gameState==0) {
+            String in = s.nextLine().toUpperCase();
+            if(in.equals("B")) moveBackward();
+            else if(in.equals("F")) moveForward(chooseMovePath());
+            else if(in.equals("END")) break;
+            else if(in.length()!=4) System.out.println("Invalid Input");
             else{
-                moveForward(moveTree.addMove(bot.findBestLine(4).head.next.get(0)));
-                print();
+                int[] pos = new int[] {in.charAt(0)-'A',in.charAt(1)-'1'};
+                int[] dest = new int[] {in.charAt(2)-'A',in.charAt(3)-'1'};
+                if(!existsMove(pos,dest,whiteTurn)){
+                    System.out.println("move at "+convertPos(pos)+" -> "+convertPos(dest)+" does not exist");
+                    continue;
+                }
+                moveForward(moveTree.addMove(generateMove(query(pos),dest)));
             }
+            fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
+            fillSquare('/',new int[]{moveTree.current.destHash%8,moveTree.current.destHash/8});
+            print();
+            System.out.println();
+            moveTree.print();
         }
         if(gameState==1) System.out.println("White Wins!");
         else if(gameState==2) System.out.println("Black Wins!");
@@ -139,40 +170,6 @@ public class Board {
         }
         return x;
     }
-    public void test(String address) {
-        Scanner s;
-        try{
-            s = new Scanner(Paths.get(address));
-        }catch (Exception e){
-            System.out.println("error");
-            return;
-        }
-        s.useDelimiter("\n");
-        while(s.hasNext()) {
-            while(true){
-                try {
-                    Scanner user = new Scanner(System.in);
-                    System.out.println("\"b\": back");
-                    System.out.println("[ENTER]: forward");
-                    if(user.nextLine().equals("b")) moveBackward();
-                    else if(moveTree.current!=null&&!moveTree.current.next.isEmpty()) moveForward(0);
-                    else break;
-                    print();
-                    System.out.println();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-            String in = s.nextLine();
-            movePiece(new int[] {in.charAt(0)-'A',in.charAt(1)-'1'}, new int[] {in.charAt(2)-'A',in.charAt(3)-'1'},whiteTurn);
-            whiteTurn=moveCount%2==0;
-        }
-        print();
-        System.out.println();
-        if(gameState==1) System.out.println("White Wins!");
-        else if(gameState==2) System.out.println("Black Wins!");
-        else System.out.println("Stale Mate!");
-    }
     public void play(String address) {
         Scanner s;
         try{
@@ -183,9 +180,20 @@ public class Board {
         }
         s.useDelimiter("\n");
         while(s.hasNext()) {
-            String in = s.nextLine();
-            movePiece(new int[] {in.charAt(0)-'A',in.charAt(1)-'1'}, new int[] {in.charAt(2)-'A',in.charAt(3)-'1'},whiteTurn);
-            whiteTurn=moveCount%2==0;
+            String in = s.nextLine().toUpperCase();
+            int[] pos = new int[] {in.charAt(0)-'A',in.charAt(1)-'1'};
+            int[] dest = new int[] {in.charAt(2)-'A',in.charAt(3)-'1'};
+            if(!existsMove(pos,dest,whiteTurn)){
+                System.out.println("move at "+convertPos(pos)+" -> "+convertPos(dest)+" does not exist");
+                throw new RuntimeException("DNE");
+            }
+            moveForward(moveTree.addMove(generateMove(query(pos),dest)));
+            fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
+            fillSquare('/',new int[]{moveTree.current.destHash%8,moveTree.current.destHash/8});
+            print();
+            System.out.println();
+            System.out.println(moveTree.current);
+
         }
         System.out.println();
         if(gameState==0) return;
@@ -196,31 +204,18 @@ public class Board {
         else if(gameState==2) System.out.println("Black Wins!");
         else System.out.println("Stale Mate!");
     }
-    public void movePiece(int[] pos, int[] dest, boolean isWhite){
-        if(Board.outOfBounds(pos)||Board.outOfBounds(dest)){
-            System.out.println(Arrays.toString(pos)+" -> "+Arrays.toString(dest)+" Invalid Input");
-            return;
-        }
+    public boolean existsMove(int[] pos, int[] dest, boolean isWhite){
+        if(Board.outOfBounds(pos)||Board.outOfBounds(dest)) return false;
         Piece piece = query(pos[0],pos[1]);
-        System.out.println("attempting: "+piece+ " -> "+convertPos(dest));
-        if (piece!=null&&piece.isWhite==isWhite&&piece.canMove(dest, this, true)){
-            fillSquare('=',pos);
-            for (Integer [] m : getMoves(piece)) fillSquare(':',new int[]{m[0],m[1]});
-            MoveNode m;
-            if((dest[1]==0||dest[1]==7)&&piece.getName().equals(Pawn.name)) m=getPromotions((Pawn)piece, dest).get(choosePromotion());
-            else m = piece.generateMove(dest, this);
-            m.posHash=getHash(pos);
-            m.destHash=getHash(dest);
-            moveForward(moveTree.addMove(m));
-            System.out.println("Move Successful!");
-            print();
-            System.out.println();
-        }
-        else {
-            System.out.println("Move Failed :(");
-            //throw new RuntimeException("Move failed");
-        }
-
+        return piece!=null&&piece.isWhite==isWhite&&piece.canMove(dest, this, true);
+    }
+    public MoveNode generateMove(Piece piece, int[] dest){
+        MoveNode m;
+        if((dest[1]==0||dest[1]==7)&&piece.getName().equals(Pawn.name)) m=getPromotions((Pawn)piece, dest).get(choosePromotion());
+        else m = piece.generateMove(dest, this);
+        m.posHash=getHash(piece.position);
+        m.destHash=getHash(dest);
+        return m;
     }
     public void moveForward(int ind){
         if(moveTree.current==moveTree.head||query(moveTree.current.current.get(0).position)==(moveTree.current.current.get(0))){
@@ -268,7 +263,7 @@ public class Board {
         if(!counters.isEmpty()) return false;
         if(attacker.getName().equals("Horse")) return true;
         int[] temp=new int[]{attacker.position[0],attacker.position[1]};
-        ArrayList<Piece> defenders = isWhite ? whitePieces : blackPieces;
+        ArrayList<Piece> defenders = new ArrayList<>(isWhite ? whitePieces : blackPieces);
         while(temp[0]!=king.position[0]&&temp[1]!=king.position[1]){
             temp[0]+=temp[0]<king.position[0] ? 1 : -1;
             temp[1]+=temp[1]<king.position[1] ? 1 : -1;
@@ -284,7 +279,7 @@ public class Board {
     }
     public boolean isInCheck(boolean isWhite){
         King king = isWhite ? whiteKing : blackKing;
-        ArrayList<Piece> attackers = isWhite ? blackPieces : whitePieces;
+        ArrayList<Piece> attackers = new ArrayList<>(isWhite ? blackPieces : whitePieces);
         for(Piece p : attackers) if(p.canMove(king.position,this, false)) return true;
         return false;
     }
@@ -399,7 +394,7 @@ public class Board {
         if(!pawn.getName().equals(Pawn.name)||pawn.isWhite!=whiteTurn) return null;
         int[] enPass = new int[]{pawnDest[0],pawnPos[1]};
         Piece p = query(enPass);
-        return (p!=null&&p.isWhite!=pawn.isWhite&&p.getName().equals(Pawn.name)&&((((Pawn) p).charged))) ? enPass : null;
+        return (p!=null&&p.isWhite!=pawn.isWhite&&p.getName().equals(Pawn.name)&&((((Pawn) p).justCharged(this)))) ? enPass : null;
     }
     public ArrayList<MoveNode> getPromotions(Pawn p, int[] dest){
         ArrayList<MoveNode> promotions = new ArrayList<>();

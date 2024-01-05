@@ -6,7 +6,6 @@ public class Horse extends Piece{
     public static final String name="Horse";
     public Horse(boolean isWhite) {
         super(isWhite);
-        pointValue=3;
         super.name=name;
     }
 
@@ -37,6 +36,17 @@ public class Horse extends Piece{
         board.set(board.pop(dest),tempPos);
         board.set(piece,dest);
         return !inCheck;
+    }
+
+    @Override
+    public int getPointValue() {
+        return 30;
+    }
+
+    public Piece copy() {
+        Horse copy = new Horse(isWhite);
+        copy.position=new int[]{position[0],position[1]};
+        return copy;
     }
 
 }

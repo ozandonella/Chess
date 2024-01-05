@@ -57,4 +57,17 @@ public class King extends Piece{
         return !inCheck;
     }
 
+    @Override
+    public int getPointValue() {
+        return 0;
+    }
+
+    @Override
+    public Piece copy() {
+        King copy = new King(isWhite);
+        copy.position=new int[]{position[0],position[1]};
+        copy.hasMoved=hasMoved;
+        return copy;
+    }
+
 }
