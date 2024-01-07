@@ -32,6 +32,20 @@ public class MoveTree{
         if(current==null||current.next.isEmpty()) return;
         current=current.next.get(ind);
     }
+    public void setCurrent(MoveNode m){
+        if(current==head) setHead(m);
+        else{
+            m.prev=current.prev;
+            m.prev.next.remove(current);
+            prev();
+            next(addMove(m));
+        }
+
+    }
+    public void setHead(MoveNode m){
+        head=m;
+        current=head;
+    }
     /*public void print(MoveNode move){
         System.out.println(move);
         System.out.println("-----------------");
@@ -43,18 +57,42 @@ public class MoveTree{
     public void print(){
         head.print("");
     }
+    public void trim(){
+        MoveNode tempCurr = current;
+        MoveNode prev = current.prev;
+        while(prev!=null){
+            MoveNode cHolder=current;
+            current=prev.copy();
+            addMove(cHolder);
+            prev=prev.prev;
+        }
+        setHead(current);
+        current=tempCurr;
+    }
     public static void synch(MoveTree tree, MoveTree synchTo){
+        ArrayList<MoveNode> mainBranch = synchTo.getMainBranch();
+        tree.current=tree.head;
+        for(int x=mainBranch.size()-2; x>=0; x--)tree.next(tree.addMove(mainBranch.get(x)));
+    }
+    public void printCurrentLine(){
+        ArrayList<MoveNode> mainBranch=getMainBranch();
+        StringBuilder line= new StringBuilder();
+        for(int x=mainBranch.size()-1; x>=0; x--) line.append(mainBranch.get(x).toString()).append(", ");
+        System.out.println(line);
+    }
+
+    /**
+     * returns copies of the nodes leading up to the current node in REVERSE ORDER
+     */
+    public ArrayList<MoveNode> getMainBranch(){
         ArrayList<MoveNode> mainBranch=new ArrayList<>();
-        MoveNode temp=synchTo.current;
-        while(temp!=synchTo.head){
+        MoveNode temp=current;
+        while(temp!=head){
             mainBranch.add(temp.copy());
             temp=temp.prev;
         }
-        tree.current=tree.head;
-        for(int x=mainBranch.size()-1; x>=0; x--){
-            if(tree.current.next.isEmpty())tree.next(tree.addMove(mainBranch.get(x)));
-            else tree.next(tree.addMove(mainBranch.get(x)));
-        }
+        mainBranch.add(head.copy());
+        return mainBranch;
     }
 }
 

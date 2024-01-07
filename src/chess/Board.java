@@ -1,6 +1,7 @@
 package chess;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Board {
@@ -61,21 +62,33 @@ public class Board {
             }
         }
     }
-    public void playBot(){
+    public void testBot(Bot bot, int steps){
+        while(gameState==0){
+            moveForward(moveTree.addMove(bot.findBestLine(steps, this).current.next.get(0).copy()));
+            fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
+            fillSquare('/',new int[]{moveTree.current.destHash%8,moveTree.current.destHash/8});
+            print();
+            System.out.println();
+            moveTree.print();
+        }
+        if(gameState==1) System.out.println("White Wins!");
+        else if(gameState==2) System.out.println("Black Wins!");
+        else System.out.println("Stale Mate!");
+    }
+    public void playBot(Bot bot){
         Scanner s = new Scanner(System.in);
         print();
         System.out.println();
         int pieceThreshold=360/15;
-        int steps=4;
-        Bot bot = new Bot(this);
+        int steps=5;
         while(gameState==0) {
             if(!whiteTurn) {
                 String in = s.nextLine().toUpperCase();
-                if(in.equals("B"))moveBackward();
-                else if(in.equals("F"))moveForward(chooseMovePath());
+                if(in.equals("B")) moveBackward();
+                else if(in.equals("F")) moveForward(chooseMovePath());
                 else if(in.equals("END")) break;
                 else if(in.length()!=4) System.out.println("Invalid Input");
-                else{
+                else {
                     int[] pos = new int[] {in.charAt(0)-'A',in.charAt(1)-'1'};
                     int[] dest = new int[] {in.charAt(2)-'A',in.charAt(3)-'1'};
                     if(!existsMove(pos,dest,whiteTurn)){
@@ -86,7 +99,10 @@ public class Board {
                 }
             }
             else {
-                moveForward(moveTree.addMove(bot.findBestLine(steps).head.next.get(0).copy()));
+                MoveTree m =bot.findBestLine(steps,this);
+                //System.out.println("--------------bot mTree---------------");
+                //bot.tree.print();
+                moveForward(moveTree.addMove(m.current.next.get((int)(Math.random()*m.current.next.size())).copy()));
             }
             fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
             fillSquare('/',new int[]{moveTree.current.destHash%8,moveTree.current.destHash/8});
@@ -222,9 +238,13 @@ public class Board {
         return m;
     }
     public void moveForward(int ind){
-        if(moveTree.current==moveTree.head||query(moveTree.current.current.get(0).position)==(moveTree.current.current.get(0))){
+        if(moveTree.current==moveTree.head|| Arrays.equals(query(moveTree.current.current.get(0).position).position, moveTree.current.current.get(0).position)){
             if(moveTree.current.next.isEmpty()) return;
             moveTree.next(ind);
+        }
+        else if(moveTree.current.next.isEmpty()){
+            Main.printTreeData(moveTree);
+            return;
         }
         for(Piece p : moveTree.current.former) set(null,p.position);
         for (Piece p : moveTree.current.current) set(p,p.position);

@@ -34,7 +34,7 @@ public class King extends Piece{
 
     @Override
     public boolean canMove(int[] dest, Board board, boolean withSafety) {
-        if(board.query(this.position)==null||!board.query(this.position).equals(this)) throw new RuntimeException("piece location error: piece-> "+this+" location-> "+ Arrays.toString(dest));
+        if(board.query(this.position)==null||!board.query(this.position).equals(this)) throw new RuntimeException("piece location error: found-> "+board.query(this.position)+" at " +this+" location-> ");
         int x = Math.abs(position[0]-dest[0]), y = Math.abs(position[1]-dest[1]);
         if(y>1||x>2||(x==2&&y!=0)) return false;
         int[] rookPos = null;

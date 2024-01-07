@@ -17,10 +17,16 @@ public class Main {
     public static void main(String[] args) {
         Board b = new Board(9, 3);
         b.populate();
-        b.play(testFiles[6]);
-        Bot bot= new Bot(b);
-        b.playBot();
+        Bot bot = new Bot();
+        bot.findBestLine(5,b);
         b.play();
+        MoveTree.synch(bot.tree,b.moveTree);
+        bot.tree.trim();
+        bot.tree.print();
+        b.play();
+
+        // b.testBot(bot, 2);
+        //bot.tree.print();
         //System.out.println(bot.evalBoard());
         /*b.board.get(0).get(4).move(new int[]{2,5});
         System.out.println();
@@ -63,6 +69,7 @@ public class Main {
     public static void printTreeData(MoveTree m){
         MoveNode t = m.head;
         System.out.println("--------current--------");
+        System.out.println("current==head "+(m.current==m.head));
         System.out.println(m.current);
         System.out.println(m.current.former);
         System.out.println(m.current.current);
@@ -87,8 +94,8 @@ public class Main {
         System.out.println("BOT TREE DATA");
         System.out.println();
         MoveTree copy = new MoveTree();
-        //MoveTree.synch(copy,b.tree);
-        //printTreeData(b.tree);
+        MoveTree.synch(copy,b.tree);
+        printTreeData(b.tree);
         System.out.println();
         System.out.println("BOARD TREE DATA");
         System.out.println();

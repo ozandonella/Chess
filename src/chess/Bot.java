@@ -3,12 +3,11 @@ package chess;
 import java.util.ArrayList;
 
 public class Bot {
-    private final Board board;
-    public MoveTree tree;
-    public Bot(Board board){
-        this.board=board;
+    public final MoveTree tree;
+    public Bot(){
+        tree=new MoveTree();
     }
-    public ArrayList<MoveNode> generateMoves(boolean isWhite){
+    public ArrayList<MoveNode> generateMoves(boolean isWhite, Board board){
         ArrayList<MoveNode> moves = new ArrayList<>();
         ArrayList<Piece> pieces = new ArrayList<>(isWhite ? board.whitePieces : board.blackPieces);
         for(Piece piece : pieces){
@@ -41,7 +40,7 @@ public class Bot {
         }
         return moves;
     }
-    public int evalBoard(){
+    public int evalBoard(Board board){
         if(board.gameState==1) return 400;
         if(board.gameState==2) return -400;
         if(board.gameState==3) return 0;
@@ -62,36 +61,73 @@ public class Bot {
         sum+=(whiteAttackers);
         return sum;
     }
-    public MoveTree findBestLine(int steps){
+    public MoveTree findBestLine(int steps, Board board){
         if(steps==0) return null;
         MoveTree temp = board.moveTree;
-        MoveTree bestLine= new MoveTree();
-        board.moveTree = bestLine;
-        findPath(steps);
+        MoveTree.synch(tree,board.moveTree);
+        tree.trim();
+        board.moveTree = tree;
+        MoveTree t=new MoveTree();
+        t.setHead(growTree(steps, board));
+        //tree.print();
         board.moveTree=temp;
-        bestLine.print();
-        return bestLine;
+        return t;
     }
-    public void findPath(int steps){
+    public void setToBestLines(int steps, Board board){
+        MoveTree temp = board.moveTree;
+        MoveTree.synch(tree,board.moveTree);
+        board.moveTree = tree;
+        findPath(steps,board);
+        tree.printCurrentLine();
+        board.moveTree=temp;
+
+    }
+
+    public MoveNode growTree(int steps, Board board){
         if(steps==0||board.gameState!=0){
-            board.moveTree.current.value=evalBoard();
+            board.moveTree.current.value=evalBoard(board);
+            return board.moveTree.current.copy();
+        }
+        ArrayList<MoveNode> next = new ArrayList<>();
+        ArrayList<MoveNode> moves = tree.current.next.isEmpty() ? generateMoves(board.whiteTurn,board) : tree.current.next;
+        int val=1000;
+        for(MoveNode move : moves){
+            board.moveForward(board.moveTree.addMove(move));
+            next.add(growTree(steps-1, board));
+            board.moveBackward();
+            if(val==1000||(board.whiteTurn&&move.value>val)||(!board.whiteTurn&&move.value<val)) val=move.value;
+        }
+        board.moveTree.current.value = val;
+        MoveNode ret = board.moveTree.current.copy();
+        for(MoveNode move : next){
+            if(move.value==val){
+                ret.next.add(move);
+                move.prev=ret;
+            }
+        }
+        return ret;
+    }
+    public void findPath(int steps, Board board){
+        if(steps==0||board.gameState!=0){
+            board.moveTree.current.value=evalBoard(board);
             return;
         }
         MoveNode best = null;
         int val=1000;
-        for(MoveNode move : generateMoves(board.whiteTurn)){
+        ArrayList<MoveNode> next = new ArrayList<>();
+        ArrayList<MoveNode> moves = generateMoves(board.whiteTurn, board);
+        for(MoveNode move : moves){
             board.moveForward(board.moveTree.addMove(move));
-            findPath(steps-1);
+            findPath(steps-1, board);
             board.moveBackward();
+            next.add(move);
             if(best==null||board.whiteTurn&&move.value>val||!board.whiteTurn&&move.value<val){
                 best=move;
                 val=move.value;
             }
         }
-        if(best!=null) {
-            board.moveTree.current.value = val;
-            board.moveTree.current.next = new ArrayList<>();
-            board.moveTree.addMove(best);
-        }
+        board.moveTree.current.value = val;
+        board.moveTree.current.next = new ArrayList<>();
+        for(MoveNode m : next) if(m.value==val) board.moveTree.addMove(m);
     }
 }
