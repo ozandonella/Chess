@@ -64,12 +64,12 @@ public class Board {
     }
     public void testBot(Bot bot, int steps){
         while(gameState==0){
-            moveForward(moveTree.addMove(bot.findBestLine(steps, this).current.next.get(0).copy()));
+            MoveTree m =bot.findBestLine(steps,this);
+            moveForward(moveTree.addMove(m.current.next.get((int)(Math.random()*m.current.next.size())).copy()));
             fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
             fillSquare('/',new int[]{moveTree.current.destHash%8,moveTree.current.destHash/8});
             print();
             System.out.println();
-            moveTree.print();
         }
         if(gameState==1) System.out.println("White Wins!");
         else if(gameState==2) System.out.println("Black Wins!");
@@ -80,7 +80,7 @@ public class Board {
         print();
         System.out.println();
         int pieceThreshold=360/15;
-        int steps=5;
+        int steps=4;
         while(gameState==0) {
             if(!whiteTurn) {
                 String in = s.nextLine().toUpperCase();

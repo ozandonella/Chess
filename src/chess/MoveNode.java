@@ -37,5 +37,12 @@ public class MoveNode {
         copy.current.addAll(current);
         return copy;
     }
-
+    public String decodeHash(){
+        String moveRep="";
+        moveRep+=Board.letters[posHash%8];
+        moveRep+=Board.numbers[posHash/8];
+        moveRep+=Board.letters[destHash%8];
+        moveRep+=Board.numbers[destHash/8];
+        return moveRep;
+    }
 }

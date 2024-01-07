@@ -15,7 +15,8 @@ public class Pawn extends Piece{
         move.former.add(this);
         if(board.query(dest)!=null) move.former.add(board.query(dest));
         Pawn current = new Pawn(isWhite);
-        if(current.turnMoved==null) current.turnMoved=board.moveCount;
+        if(turnMoved==null) current.turnMoved=board.moveCount;
+        else current.turnMoved=turnMoved;
         current.position[0]=dest[0];
         current.position[1]=dest[1];
         move.current.add(current);
@@ -47,7 +48,7 @@ public class Pawn extends Piece{
 
     @Override
     public int getPointValue() {
-        return 10+(isWhite ? position[1]-1 : 6-position[1])/2;
+        return 10+(isWhite ? position[1]-1 : 6-position[1])/3;
     }
 
     public boolean justCharged(Board board){

@@ -1,6 +1,8 @@
 package chess;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.Scanner;
 public class Main {
     public static String[][] whitePieces;
@@ -12,19 +14,15 @@ public class Main {
             "staleMateTest.txt",
             "CarlsenVsErnst.txt",
             "botTest1.txt",
-            "PromotionBotTest.txt"
+            "PromotionBotTest.txt",
+            "enPassDebug.txt"
     };
     public static void main(String[] args) {
         Board b = new Board(9, 3);
         b.populate();
         Bot bot = new Bot();
-        bot.findBestLine(5,b);
+        b.play("enPassDebug.txt");
         b.play();
-        MoveTree.synch(bot.tree,b.moveTree);
-        bot.tree.trim();
-        bot.tree.print();
-        b.play();
-
         // b.testBot(bot, 2);
         //bot.tree.print();
         //System.out.println(bot.evalBoard());
@@ -111,6 +109,18 @@ public class Main {
         }
         for(int x=0; x<6; x++){
             whitePieces[x]=s.nextLine().split(";");
+        }
+    }
+    public static void saveMoveSet(MoveTree m, String fileName){
+        try {
+            File file = new File(fileName);
+            if (file.exists()) throw new RuntimeException("file already exists");
+            PrintWriter write = new PrintWriter(file);
+            ArrayList<MoveNode> mainBranch=m.getMainBranch();
+            for (int x=mainBranch.size()-2; x>=0; x--) write.println(mainBranch.get(x).decodeHash());
+            write.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 }
