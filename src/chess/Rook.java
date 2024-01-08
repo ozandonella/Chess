@@ -42,7 +42,6 @@ public class Rook extends Piece{
     public int getPointValue() {
         return 50;
     }
-
     public boolean hasMoved() {
         return hasMoved;
     }

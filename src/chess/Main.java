@@ -2,7 +2,6 @@ package chess;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Formatter;
 import java.util.Scanner;
 public class Main {
     public static String[][] whitePieces;
@@ -18,14 +17,10 @@ public class Main {
             "enPassDebug.txt"
     };
     public static void main(String[] args) {
-        Board b = new Board(9, 3);
+        Board b = new Board(9,3);
         b.populate();
         Bot bot = new Bot();
-        b.play("enPassDebug.txt");
-        b.play();
-        // b.testBot(bot, 2);
-        //bot.tree.print();
-        //System.out.println(bot.evalBoard());
+        testBotSpeed(5,5);
         /*b.board.get(0).get(4).move(new int[]{2,5});
         System.out.println();
         b.board.get(7).get(4).move(new int[]{0,2});*/
@@ -122,5 +117,24 @@ public class Main {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+    /*
+
+     */
+    public static long testBotSpeed(int steps,int sampleSize){
+        long average=0;
+        for(int x=1; x<=sampleSize; x++){
+            Board b = new Board(9,3);
+            b.populate();
+            Bot bot = new Bot();
+            long t=System.currentTimeMillis();
+            bot.findBestLine(steps,b);
+            t=System.currentTimeMillis()-t;
+            System.out.println(x+": "+t+"ms");
+            average+=t;
+        }
+        average/=sampleSize;
+        System.out.println("Average: "+average +"ms");
+        return average;
     }
 }

@@ -9,7 +9,7 @@ public class Queen extends Piece{
     }
 
     @Override
-    public MoveNode generateMove(int[] dest, Board board) {
+     public MoveNode generateMove(int[] dest, Board board) {
         MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
         move.former.add(this);
         if(board.query(dest)!=null) move.former.add(board.query(dest));
