@@ -45,4 +45,10 @@ public class MoveNode {
         moveRep+=Board.numbers[destHash/8];
         return moveRep;
     }
+    public long size(){
+        if(next.isEmpty()) return 1;
+        long k = 0;
+        for(MoveNode m : next) k+=m.size();
+        return k;
+    }
 }

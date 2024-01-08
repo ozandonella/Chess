@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Rook extends Piece{
@@ -42,9 +43,19 @@ public class Rook extends Piece{
     public int getPointValue() {
         return 50;
     }
+
+    @Override
+    public ArrayList<int[]> getMovePattern(Board board) {
+        ArrayList<int[]> borders=Board.getCardinalBorders(position);
+        ArrayList<int[]> destinations = new ArrayList<>();
+        for(int[] border : borders) destinations.addAll(board.getCardinalPositions(this,border));
+        return destinations;
+    }
+
     public boolean hasMoved() {
         return hasMoved;
     }
+
     public Piece copy() {
         Rook copy = new Rook(isWhite);
         copy.hasMoved=hasMoved;

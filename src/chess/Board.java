@@ -242,12 +242,9 @@ public class Board {
             if(moveTree.current.next.isEmpty()) return;
             moveTree.next(ind);
         }
-        else if(moveTree.current.next.isEmpty()){
-            Main.printTreeData(moveTree);
-            return;
-        }
         for(Piece p : moveTree.current.former) set(null,p.position);
         for (Piece p : moveTree.current.current) set(p,p.position);
+        for(int[] dest : getMoves(moveTree.current.current.get(0))) fillSquare('-',dest);
         if(isInCheck(!whiteTurn)){
             if(isMate(!whiteTurn)) gameState=whiteTurn ? 1 : 2;
         }
@@ -328,10 +325,6 @@ public class Board {
     public void updateBoard(){
         screen.clearScreen();
         drawDividers('-','|','+');
-    }
-    public static void oppOrient(int[] pos){
-        pos[0]=7-pos[0];
-        pos[1]=7-pos[1];
     }
     public static boolean outOfBounds(int[] pos){
         return pos==null||pos[0] >= 8 || pos[0] <= -1 || pos[1] >= 8 || pos[1] <= -1;
@@ -439,6 +432,19 @@ public class Board {
         }
         return promotions;
     }
+    public ArrayList<int[]> getCardinalPositions(Piece p, int[] dest){
+        //if(isNotCardinal(p.position,dest)) return null;
+        ArrayList<int[]> destinations = new ArrayList<>();
+        int x=p.position[0], y=p.position[1];
+        while(x!=dest[0]||y!=dest[1]){
+            if(x!=dest[0]) x+=x<dest[0]?1:-1;
+            if(y!=dest[1]) y+=y<dest[1]?1:-1;
+            int[] d = new int[]{x,y};
+            destinations.add(d);
+            if(query(x,y)!=null) break;
+        }
+        return destinations;
+    }
     public boolean cantMoveCardinally(int[] pos, int[] dest){
         if(isNotCardinal(pos, dest)) return true;
         int x=pos[0], y=pos[1];
@@ -451,15 +457,55 @@ public class Board {
         }
         return false;
     }
-    public ArrayList<Integer[]> getMoves(Piece piece){
-        ArrayList<Integer[]> res = new ArrayList<>();
+    /*public ArrayList<int[]> getMoves(Piece piece){
+        ArrayList<int[]> res = new ArrayList<>();
         if(piece==null) return res;
         for(int y=0; y<8; y++){
             for(int x=0; x<8; x++){
-                if(piece.canMove(new int[]{x,y},this, true)) res.add(new Integer[]{x,y});
+                if(piece.canMove(new int[]{x,y},this, true)) res.add(new int[]{x,y});
             }
         }
         return res;
+    }*/
+    public ArrayList<int[]> getMoves(Piece piece){
+        ArrayList<int[]> res = new ArrayList<>();
+        if(piece==null) return res;
+        for(int[] dest : piece.getMovePattern(this)) if(piece.canMove(dest,this,true)) res.add(dest);
+        return res;
+    }
+    public static ArrayList<int[]> getCardinalBorders(int[] pos){
+
+        ArrayList<int[]> borders = new ArrayList<>();
+        if(pos[1]!=7) borders.add(new int[]{pos[0], 7});
+        if(pos[1]!=0) borders.add(new int[]{pos[0], 0});
+        if(pos[0]!=0) borders.add(new int[]{0, pos[1]});
+        if(pos[0]!=7) borders.add(new int[]{7, pos[1]});
+        return borders;
+    }
+    public static ArrayList<int[]> getDiagonalBorders(int[] pos){
+        ArrayList<int[]> borders = new ArrayList<>();
+        int dist;
+        if(pos[1]!=7){
+            if(pos[0]!=0){
+                dist=Math.min(pos[0],7-pos[1]);
+                borders.add(new int[]{pos[0]-dist, pos[1]+dist});
+            }
+            if(pos[0]!=7){
+                dist=Math.min(7-pos[0],7-pos[1]);
+                borders.add(new int[]{pos[0]+dist, pos[1]+dist});
+            }
+        }
+        if(pos[1]!=0){
+            if(pos[0]!=7){
+                dist=Math.min(pos[1],7-pos[0]);
+                borders.add(new int[]{pos[0]+dist, pos[1]-dist});
+            }
+            if(pos[0]!=0){
+                dist=Math.min(pos[0],pos[1]);
+                borders.add(new int[]{pos[0]-dist, pos[1]-dist});
+            }
+        }
+        return borders;
     }
     public void setGraphic(String graphic, int[] dest, int level){
         int x=X/2+dest[0]*(X+1)+1;

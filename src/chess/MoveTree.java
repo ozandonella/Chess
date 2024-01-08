@@ -94,5 +94,8 @@ public class MoveTree{
         mainBranch.add(head.copy());
         return mainBranch;
     }
+    public long size(){
+        return head.size();
+    }
 }
 

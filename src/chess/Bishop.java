@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Bishop extends Piece{
@@ -37,6 +38,14 @@ public class Bishop extends Piece{
     @Override
     public int getPointValue() {
         return 30;
+    }
+
+    @Override
+    public ArrayList<int[]> getMovePattern(Board board) {
+        ArrayList<int[]> borders=Board.getDiagonalBorders(position);
+        ArrayList<int[]> destinations = new ArrayList<>();
+        for(int[] border : borders) destinations.addAll(board.getCardinalPositions(this,border));
+        return destinations;
     }
 
     public Piece copy() {

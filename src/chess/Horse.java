@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Horse extends Piece{
@@ -8,7 +9,6 @@ public class Horse extends Piece{
         super(isWhite);
         super.name=name;
     }
-
     @Override
     public MoveNode generateMove(int[] dest, Board board) {
         MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
@@ -20,7 +20,6 @@ public class Horse extends Piece{
         move.current.add(current);
         return move;
     }
-
     @Override
     public boolean canMove(int[] dest, Board board, boolean withSafety) {
         if(board.query(this.position)==null||!board.query(this.position).equals(this)) throw new RuntimeException("piece location error: piece-> "+this+" location-> "+ Arrays.toString(dest));
@@ -41,6 +40,28 @@ public class Horse extends Piece{
     @Override
     public int getPointValue() {
         return 30;
+    }
+
+    @Override
+    public ArrayList<int[]> getMovePattern(Board board) {
+        ArrayList<int[]> destinations=new ArrayList<>();
+        if(position[0]>0){
+            if(position[1]<6) destinations.add(new int[]{position[0]-1, position[1]+2});
+            if(position[1]>1) destinations.add(new int[]{position[0]-1, position[1]-2});
+        }
+        if(position[0]<7){
+            if(position[1]<6) destinations.add(new int[]{position[0]+1, position[1]+2});
+            if(position[1]>1) destinations.add(new int[]{position[0]+1, position[1]-2});
+        }
+        if(position[1]>0){
+            if(position[0]>1) destinations.add(new int[]{position[0]-2, position[1]-1});
+            if(position[0]<6) destinations.add(new int[]{position[0]+2, position[1]-1});
+        }
+        if(position[1]<7){
+            if(position[0]>1) destinations.add(new int[]{position[0]-2, position[1]+1});
+            if(position[0]<6) destinations.add(new int[]{position[0]+2, position[1]+1});
+        }
+        return destinations;
     }
 
     public Piece copy() {

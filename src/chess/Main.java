@@ -2,6 +2,7 @@ package chess;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 public class Main {
     public static String[][] whitePieces;
@@ -21,9 +22,12 @@ public class Main {
         b.populate();
         Bot bot = new Bot();
         testBotSpeed(5,5);
-        /*b.board.get(0).get(4).move(new int[]{2,5});
-        System.out.println();
-        b.board.get(7).get(4).move(new int[]{0,2});*/
+        //20
+        //400
+        //8902
+        //197281
+        //4865609
+
         /*try{
             getPieces();
         }catch (Exception e){
@@ -136,5 +140,12 @@ public class Main {
         average/=sampleSize;
         System.out.println("Average: "+average +"ms");
         return average;
+    }
+    public static void runTests(){
+        for(String s : testFiles){
+            Board b = new Board(9,3);
+            b.populate();
+            b.play(s);
+        }
     }
 }

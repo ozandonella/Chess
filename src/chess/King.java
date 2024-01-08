@@ -1,4 +1,5 @@
 package chess;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class King extends Piece{
@@ -60,6 +61,24 @@ public class King extends Piece{
     @Override
     public int getPointValue() {
         return 0;
+    }
+
+    @Override
+    public ArrayList<int[]> getMovePattern(Board board) {
+        ArrayList<int[]> destinations=Board.getCardinalBorders(position);
+        destinations.addAll(Board.getDiagonalBorders(position));
+
+        for(int[] border : destinations){
+            if(border[0]<position[0]) border[0]=position[0]-1;
+            if(border[0]>position[0]) border[0]=position[0]+1;
+            if(border[1]<position[1]) border[1]=position[1]-1;
+            if(border[1]>position[1]) border[1]=position[1]+1;
+        }
+        if(!hasMoved){
+            destinations.add(new int[]{position[0]+2, position[1]});
+            destinations.add(new int[]{position[0]-2, position[1]});
+        }
+        return destinations;
     }
 
     @Override

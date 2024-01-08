@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Pawn extends Piece{
@@ -49,6 +50,24 @@ public class Pawn extends Piece{
     @Override
     public int getPointValue() {
         return 10+(isWhite ? position[1]-1 : 6-position[1])/3;
+    }
+
+    @Override
+    public ArrayList<int[]> getMovePattern(Board board) {
+        ArrayList<int[]> destinations = new ArrayList<>();
+        if(isWhite){
+            destinations.add(new int[]{position[0],position[1]+1});
+            if(position[1]==1)destinations.add(new int[]{position[0],position[1]+2});
+            if(position[0]!=0)destinations.add(new int[]{position[0]-1, position[1]+1});
+            if(position[0]!=7)destinations.add(new int[]{position[0]+1, position[1]+1});
+        }
+        else{
+            destinations.add(new int[]{position[0],position[1]-1});
+            if(position[1]==6)destinations.add(new int[]{position[0],position[1]-2});
+            if(position[0]!=0)destinations.add(new int[]{position[0]-1, position[1]-1});
+            if(position[0]!=7)destinations.add(new int[]{position[0]+1, position[1]-1});
+        }
+        return destinations;
     }
 
     public boolean justCharged(Board board){

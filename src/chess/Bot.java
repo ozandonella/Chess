@@ -11,29 +11,28 @@ public class Bot {
         ArrayList<MoveNode> moves = new ArrayList<>();
         ArrayList<Piece> pieces = new ArrayList<>(isWhite ? board.whitePieces : board.blackPieces);
         for(Piece piece : pieces){
-            for(Integer[] d : board.getMoves(piece)){
-                int[] dest = new int[]{d[0],d[1]};
-                if((dest[1]==0||dest[1]==7)&&piece.getName().equals(Pawn.name)){
-                    Piece cap = board.query(dest);
+            for(int[] d : board.getMoves(piece)){
+                if((d[1]==0||d[1]==7)&&piece.getName().equals(Pawn.name)){
+                    Piece cap = board.query(d);
                     for(int x=0; x<2; x++){
-                        MoveNode move = new MoveNode(piece + " -> "+Board.convertPos(dest));
+                        MoveNode move = new MoveNode(piece + " -> "+Board.convertPos(d));
                         Piece p;
                         move.former.add(piece);
                         if(cap!=null) move.former.add(cap);
                         if(x==0) p=new Horse(piece.isWhite);
                         else p=new Queen(piece.isWhite);
-                        p.position=dest;
+                        p.position=d;
                         move.current.add(p);
                         move.posHash=Board.getHash(piece.position);
-                        move.destHash=Board.getHash(dest);
+                        move.destHash=Board.getHash(d);
                         move.name+="("+move.current.get(0).getName()+")";
                         moves.add(move);
                     }
                 }
                 else{
-                    MoveNode m = piece.generateMove(dest, board);
+                    MoveNode m = piece.generateMove(d, board);
                     m.posHash=Board.getHash(piece.position);
-                    m.destHash=Board.getHash(dest);
+                    m.destHash=Board.getHash(d);
                     moves.add(m);
                 }
             }
