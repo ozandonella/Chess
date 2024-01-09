@@ -2,7 +2,6 @@ package chess;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 public class Main {
     public static String[][] whitePieces;
@@ -21,6 +20,8 @@ public class Main {
         Board b = new Board(9,3);
         b.populate();
         Bot bot = new Bot();
+        bot.findBestLine(5,b);
+        System.out.println(bot.tree.size());
         testBotSpeed(5,5);
         //20
         //400
@@ -127,10 +128,10 @@ public class Main {
      */
     public static long testBotSpeed(int steps,int sampleSize){
         long average=0;
+        Bot bot = new Bot();
         for(int x=1; x<=sampleSize; x++){
             Board b = new Board(9,3);
             b.populate();
-            Bot bot = new Bot();
             long t=System.currentTimeMillis();
             bot.findBestLine(steps,b);
             t=System.currentTimeMillis()-t;

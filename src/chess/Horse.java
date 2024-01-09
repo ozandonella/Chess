@@ -44,24 +44,7 @@ public class Horse extends Piece{
 
     @Override
     public ArrayList<int[]> getMovePattern(Board board) {
-        ArrayList<int[]> destinations=new ArrayList<>();
-        if(position[0]>0){
-            if(position[1]<6) destinations.add(new int[]{position[0]-1, position[1]+2});
-            if(position[1]>1) destinations.add(new int[]{position[0]-1, position[1]-2});
-        }
-        if(position[0]<7){
-            if(position[1]<6) destinations.add(new int[]{position[0]+1, position[1]+2});
-            if(position[1]>1) destinations.add(new int[]{position[0]+1, position[1]-2});
-        }
-        if(position[1]>0){
-            if(position[0]>1) destinations.add(new int[]{position[0]-2, position[1]-1});
-            if(position[0]<6) destinations.add(new int[]{position[0]+2, position[1]-1});
-        }
-        if(position[1]<7){
-            if(position[0]>1) destinations.add(new int[]{position[0]-2, position[1]+1});
-            if(position[0]<6) destinations.add(new int[]{position[0]+2, position[1]+1});
-        }
-        return destinations;
+        return Piece.getHorseMoves(position);
     }
 
     public Piece copy() {

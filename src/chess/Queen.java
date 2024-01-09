@@ -35,10 +35,10 @@ public class Queen extends Piece{
     }
     @Override
     public ArrayList<int[]> getMovePattern(Board board) {
-        ArrayList<int[]> borders=Board.getCardinalBorders(position);
-        borders.addAll(Board.getDiagonalBorders(position));
+        ArrayList<int[]> borders=Piece.getCardinalBorders(position);
+        borders.addAll(Piece.getDiagonalBorders(position));
         ArrayList<int[]> destinations = new ArrayList<>();
-        for(int[] border : borders) destinations.addAll(board.getCardinalPositions(this,border));
+        for(int[] border : borders) destinations.addAll(Piece.getOmniMoves(this,border,board));
         return destinations;
     }
 

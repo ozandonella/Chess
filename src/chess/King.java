@@ -65,8 +65,8 @@ public class King extends Piece{
 
     @Override
     public ArrayList<int[]> getMovePattern(Board board) {
-        ArrayList<int[]> destinations=Board.getCardinalBorders(position);
-        destinations.addAll(Board.getDiagonalBorders(position));
+        ArrayList<int[]> destinations=Piece.getCardinalBorders(position);
+        destinations.addAll(Piece.getDiagonalBorders(position));
 
         for(int[] border : destinations){
             if(border[0]<position[0]) border[0]=position[0]-1;
@@ -80,7 +80,63 @@ public class King extends Piece{
         }
         return destinations;
     }
-
+    public boolean inCheck(Board board){
+        ArrayList<int[]> ends = Piece.getCardinalBorders(position);
+        for(int[] end : ends){
+            Piece p = board.getFirstPiece(position,end);
+            if(p!=null&&p.isWhite!=isWhite){
+                char c = p.name.charAt(0);
+                if(c=='R'||c=='Q') return true;
+            }
+        }
+        ends = Piece.getDiagonalBorders(position);
+        for(int[] end : ends){
+            Piece p = board.getFirstPiece(position,end);
+            if(p!=null&&p.isWhite!=isWhite){
+                char c = p.name.charAt(0);
+                if(c=='B'||c=='Q') return true;
+                else if(c=='P'){
+                    if(isWhite&&p.position[1]>position[1]) return true;
+                    else if(!isWhite&&p.position[1]<position[1]) return true;
+                }
+            }
+        }
+        ends = Piece.getHorseMoves(position);
+        for(int[] end : ends){
+            Piece p = board.query(end);
+            if(p!=null&&p.isWhite!=isWhite&&p.name.charAt(0)=='H') return true;
+        }
+        return false;
+    }
+    public ArrayList<Piece> getAttackers(Board board){
+        ArrayList<Piece> attackers=new ArrayList<>();
+        ArrayList<int[]> ends = Piece.getCardinalBorders(position);
+        for(int[] end : ends){
+            Piece p = board.getFirstPiece(position,end);
+            if(p!=null&&p.isWhite!=isWhite){
+                char c = p.name.charAt(0);
+                if(c=='R'||c=='Q') attackers.add(p);
+            }
+        }
+        ends = Piece.getDiagonalBorders(position);
+        for(int[] end : ends){
+            Piece p = board.getFirstPiece(position,end);
+            if(p!=null&&p.isWhite!=isWhite){
+                char c = p.name.charAt(0);
+                if(c=='B'||c=='Q') attackers.add(p);
+                else if(c=='P'){
+                    if(isWhite&&p.position[1]>position[1]) attackers.add(p);
+                    else if(!isWhite&&p.position[1]<position[1]) attackers.add(p);
+                }
+            }
+        }
+        ends = Piece.getHorseMoves(position);
+        for(int[] end : ends){
+            Piece p = board.query(end);
+            if(p!=null&&p.isWhite!=isWhite&&p.name.charAt(0)=='H') attackers.add(p);
+        }
+        return attackers;
+    }
     @Override
     public Piece copy() {
         King copy = new King(isWhite);
@@ -88,5 +144,6 @@ public class King extends Piece{
         copy.hasMoved=hasMoved;
         return copy;
     }
+
 
 }

@@ -42,9 +42,9 @@ public class Bishop extends Piece{
 
     @Override
     public ArrayList<int[]> getMovePattern(Board board) {
-        ArrayList<int[]> borders=Board.getDiagonalBorders(position);
+        ArrayList<int[]> borders=Piece.getDiagonalBorders(position);
         ArrayList<int[]> destinations = new ArrayList<>();
-        for(int[] border : borders) destinations.addAll(board.getCardinalPositions(this,border));
+        for(int[] border : borders) destinations.addAll(Piece.getOmniMoves(this,border,board));
         return destinations;
     }
 

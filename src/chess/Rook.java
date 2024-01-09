@@ -46,9 +46,9 @@ public class Rook extends Piece{
 
     @Override
     public ArrayList<int[]> getMovePattern(Board board) {
-        ArrayList<int[]> borders=Board.getCardinalBorders(position);
+        ArrayList<int[]> borders=Piece.getCardinalBorders(position);
         ArrayList<int[]> destinations = new ArrayList<>();
-        for(int[] border : borders) destinations.addAll(board.getCardinalPositions(this,border));
+        for(int[] border : borders) destinations.addAll(Piece.getOmniMoves(this,border,board));
         return destinations;
     }
 
