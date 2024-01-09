@@ -33,7 +33,7 @@ public class King extends Piece{
     }
 
     @Override
-    public boolean canMove(int[] dest, Board board, boolean withSafety) {
+    public boolean canMove(int[] dest, Board board) {
         if(board.query(this.position)==null||!board.query(this.position).equals(this)) throw new RuntimeException("piece location error: found-> "+board.query(this.position)+" at " +this+" location-> ");
         int x = Math.abs(position[0]-dest[0]), y = Math.abs(position[1]-dest[1]);
         if(y>1||x>2||(x==2&&y!=0)) return false;
@@ -45,12 +45,11 @@ public class King extends Piece{
             if(rookDest==null) return false;
         }
         else if(board.query(dest)!=null&&board.query(dest).isWhite==isWhite) return false;
-        if(!withSafety) return true;
         int[] tempPos=new int[]{position[0],position[1]};
         if(rookDest!=null) board.set(board.pop(rookPos),rookDest);
         Piece piece = board.pop(dest);
         board.set(board.pop(position),dest);
-        boolean inCheck=board.isInCheck(isWhite);
+        boolean inCheck=(board.whiteTurn ? board.whiteKing : board.blackKing).inCheck(board);
         if(rookDest!=null) board.set(board.pop(rookDest),rookPos);
         board.set(board.pop(dest),tempPos);
         board.set(piece,dest);

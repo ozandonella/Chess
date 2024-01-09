@@ -21,15 +21,14 @@ public class Bishop extends Piece{
         return move;
     }
     @Override
-    public boolean canMove(int[] dest, Board board, boolean withSafety) {
+    public boolean canMove(int[] dest, Board board) {
         if(board.query(position)==null||!board.query(position).equals(this)) throw new RuntimeException("piece location error: piece-> "+this+" location-> "+Arrays.toString(dest));
         if(Math.abs(position[0]-dest[0])!=Math.abs(position[1]-dest[1])) return false;
         if(board.cantMoveCardinally(position, dest)) return false;
-        if(!withSafety) return true;
         int[] tempPos=new int[]{position[0],position[1]};
         Piece piece = board.pop(dest);
         board.set(board.pop(position),dest);
-        boolean inCheck=board.isInCheck(isWhite);
+        boolean inCheck=(board.whiteTurn ? board.whiteKing : board.blackKing).inCheck(board);
         board.set(board.pop(dest),tempPos);
         board.set(piece,dest);
         return !inCheck;

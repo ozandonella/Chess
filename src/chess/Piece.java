@@ -12,7 +12,7 @@ public abstract class Piece{
         this.isWhite=isWhite;
     }
     public abstract MoveNode generateMove(int[] dest, Board board);
-    public abstract boolean canMove(int[] dest, Board board, boolean withSafety);
+    public abstract boolean canMove(int[] dest, Board board);
     public abstract int getPointValue();
     public abstract ArrayList<int[]> getMovePattern(Board board);
     public String toString(){

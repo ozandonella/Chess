@@ -113,8 +113,6 @@ public class Board {
             }
             else {
                 MoveTree m =bot.findBestLine(steps,this);
-                //System.out.println("--------------bot mTree---------------");
-                //bot.tree.print();
                 moveForward(moveTree.addMove(m.current.next.get((int)(Math.random()*m.current.next.size())).copy()));
             }
             fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
@@ -237,7 +235,7 @@ public class Board {
     public boolean existsMove(int[] pos, int[] dest, boolean isWhite){
         if(Board.outOfBounds(pos)||Board.outOfBounds(dest)) return false;
         Piece piece = query(pos[0],pos[1]);
-        return piece!=null&&piece.isWhite==isWhite&&piece.canMove(dest, this, true);
+        return piece!=null&&piece.isWhite==isWhite&&piece.canMove(dest, this);
     }
     public MoveNode generateMove(Piece piece, int[] dest){
         MoveNode m;
@@ -288,7 +286,7 @@ public class Board {
             if(y>7||y<0) continue;
             for(int x=king.position[0]-1; x<king.position[0]+2; x++){
                 if(x>7||x<0||(x==king.position[0]&&y==king.position[1])) continue;
-                boolean safe = king.canMove(new int[]{x,y},this, true);
+                boolean safe = king.canMove(new int[]{x,y},this);
                 if(safe) return false;
             }
         }
@@ -303,7 +301,7 @@ public class Board {
         while(temp[0]!=king.position[0]&&temp[1]!=king.position[1]){
             temp[0]+=temp[0]<king.position[0] ? 1 : -1;
             temp[1]+=temp[1]<king.position[1] ? 1 : -1;
-            for(Piece p : defenders) if(p.canMove(temp, this, true)) return false;
+            for(Piece p : defenders) if(p.canMove(temp, this)) return false;
         }
         return true;
     }
@@ -321,7 +319,7 @@ public class Board {
         ArrayList<Piece> res = new ArrayList<>();
         ArrayList<Piece> attackers = new ArrayList<>(isWhite ? whitePieces : blackPieces);
         for(Piece p : attackers){
-            if(p.canMove(dest,this, withSafety)||(dest[1]==p.position[1]&&existsEnPassant(p.position,new int[]{dest[0],dest[1]+(isWhite ? 1 : -1)})!=null)) res.add(p);
+            if(p.canMove(dest,this)||(dest[1]==p.position[1]&&existsEnPassant(p.position,new int[]{dest[0],dest[1]+(isWhite ? 1 : -1)})!=null)) res.add(p);
         }
         return res;
     }
@@ -469,7 +467,7 @@ public class Board {
     public ArrayList<int[]> getMoves(Piece piece){
         ArrayList<int[]> res = new ArrayList<>();
         if(piece==null) return res;
-        for(int[] dest : piece.getMovePattern(this)) if(piece.canMove(dest,this,true)) res.add(dest);
+        for(int[] dest : piece.getMovePattern(this)) if(piece.canMove(dest,this)) res.add(dest);
         return res;
     }
     public void setGraphic(String graphic, int[] dest, int level){

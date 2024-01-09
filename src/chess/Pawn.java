@@ -25,7 +25,7 @@ public class Pawn extends Piece{
         return move;
     }
     @Override
-    public boolean canMove(int[] dest, Board board, boolean withSafety) {
+    public boolean canMove(int[] dest, Board board) {
         if(board.query(position)==null||!board.query(position).equals(this)) throw new RuntimeException("piece location error: piece-> "+this+" location-> "+Arrays.toString(dest));
         if(position[1]==dest[1]||(isWhite && position[1]>dest[1]) || (!isWhite &&position[1]<dest[1])) return false;
         int x = Math.abs(position[0]-dest[0]), y = Math.abs(position[1]-dest[1]);
@@ -35,12 +35,11 @@ public class Pawn extends Piece{
         if(piece!=null&&(piece.isWhite == isWhite || x != 1)) return false;
         int[] enPass = board.existsEnPassant(position,dest);
         if(x!=0&&piece==null&&enPass==null) return false;
-        if(!withSafety) return true;
         int[] tempPos=new int[]{position[0],position[1]};
         Piece p = enPass==null ? null : board.query(enPass);
         board.set(board.pop(position),dest);
         if(p!=null) board.pop(enPass);
-        boolean inCheck=board.isInCheck(isWhite);
+        boolean inCheck=(board.whiteTurn ? board.whiteKing : board.blackKing).inCheck(board);
         board.set(board.pop(dest),tempPos);
         if(p!=null) board.set(p,enPass);
         board.set(piece,dest);

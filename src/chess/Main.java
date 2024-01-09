@@ -17,7 +17,7 @@ public class Main {
             "enPassDebug.txt"
     };
     public static void main(String[] args) {
-        runTests();
+        testBotSpeed(5,2);
         //20
         //400
         //8902
@@ -29,7 +29,6 @@ public class Main {
         }catch (Exception e){
            e.printStackTrace();
         }
-
         Screen s = new Screen(97,49);
         for(int y=0; y<s.Y; y+=6){
             s.fillYLine('|',y*2);
@@ -123,19 +122,21 @@ public class Main {
      */
     public static long testBotSpeed(int steps,int sampleSize){
         long average=0;
-        Bot bot = new Bot();
+        long size=0;
         for(int x=1; x<=sampleSize; x++){
+            Bot bot = new Bot();
             Board b = new Board(9,3);
             b.populate();
             long t=System.currentTimeMillis();
             bot.findBestLine(steps,b);
             t=System.currentTimeMillis()-t;
+            size=bot.tree.size();
             System.out.println(x+": "+t+"ms");
             average+=t;
         }
         average/=sampleSize;
         System.out.println("Average: "+average +"ms");
-        System.out.println(bot.tree.size());
+        System.out.println("Nodes found: "+size);
         return average;
     }
     public static void runTests(){
