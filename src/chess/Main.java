@@ -17,7 +17,8 @@ public class Main {
             "enPassDebug.txt"
     };
     public static void main(String[] args) {
-        testBotSpeed(5,2);
+        testBotSpeed(5,3);
+        //Ran with an average of 19030ms
         //20
         //400
         //8902
@@ -130,7 +131,7 @@ public class Main {
             long t=System.currentTimeMillis();
             bot.findBestLine(steps,b);
             t=System.currentTimeMillis()-t;
-            size=bot.tree.size();
+            if(size==0)size=bot.tree.size();
             System.out.println(x+": "+t+"ms");
             average+=t;
         }
