@@ -1,6 +1,5 @@
 package chess;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class King extends Piece{
     public static final String name="King";
@@ -87,6 +86,7 @@ public class King extends Piece{
             if(p!=null&&p.isWhite!=isWhite){
                 char c = p.name.charAt(0);
                 if(c=='R'||c=='Q') return true;
+                else if(c=='K'&&(Math.abs(position[1]-p.position[1])==1||Math.abs(position[0]-p.position[0])==1)) return true;
             }
         }
         ends = Piece.getDiagonalBorders(position);
@@ -96,9 +96,10 @@ public class King extends Piece{
                 char c = p.name.charAt(0);
                 if(c=='B'||c=='Q') return true;
                 else if(c=='P'){
-                    if(isWhite&&p.position[1]>position[1]) return true;
-                    else if(!isWhite&&p.position[1]<position[1]) return true;
+                    if(isWhite&&p.position[1]==position[1]+1) return true;
+                    else if(!isWhite&&p.position[1]==position[1]-1) return true;
                 }
+                else if(c=='K'&&(Math.abs(position[1]-p.position[1])==1)) return true;
             }
         }
         ends = Piece.getHorseMoves(position);
@@ -116,6 +117,7 @@ public class King extends Piece{
             if(p!=null&&p.isWhite!=isWhite){
                 char c = p.name.charAt(0);
                 if(c=='R'||c=='Q') attackers.add(p);
+                else if(c=='K'&&(Math.abs(position[1]-p.position[1])==1||Math.abs(position[0]-p.position[0])==1)) attackers.add(p);
             }
         }
         ends = Piece.getDiagonalBorders(position);
@@ -125,9 +127,10 @@ public class King extends Piece{
                 char c = p.name.charAt(0);
                 if(c=='B'||c=='Q') attackers.add(p);
                 else if(c=='P'){
-                    if(isWhite&&p.position[1]>position[1]) attackers.add(p);
-                    else if(!isWhite&&p.position[1]<position[1]) attackers.add(p);
+                    if(isWhite&&p.position[1]==position[1]+1) attackers.add(p);
+                    else if(!isWhite&&p.position[1]==position[1]-1) attackers.add(p);
                 }
+                else if(c=='K'&&(Math.abs(position[1]-p.position[1])==1)) attackers.add(p);
             }
         }
         ends = Piece.getHorseMoves(position);

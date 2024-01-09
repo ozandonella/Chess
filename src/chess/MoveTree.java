@@ -7,6 +7,7 @@ public class MoveTree{
     public MoveNode current;
     public MoveTree(){
         head=new MoveNode("Game Start");
+        head.gameState= Board.GameState.FREE;
         current=head;
     }
     /**

@@ -11,7 +11,9 @@ public class MoveNode {
     public int value;
     public int posHash;
     public int destHash;
+    public Board.GameState gameState;
     public MoveNode(String name){
+        gameState=Board.GameState.UNSET;
         this.name=name;
         next=new ArrayList<>();
         current=new ArrayList<>();
@@ -33,6 +35,7 @@ public class MoveNode {
         copy.value=value;
         copy.posHash=posHash;
         copy.destHash=destHash;
+        copy.gameState=gameState;
         copy.former.addAll(former);
         copy.current.addAll(current);
         return copy;

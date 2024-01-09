@@ -17,12 +17,7 @@ public class Main {
             "enPassDebug.txt"
     };
     public static void main(String[] args) {
-        Board b = new Board(9,3);
-        b.populate();
-        Bot bot = new Bot();
-        bot.findBestLine(5,b);
-        System.out.println(bot.tree.size());
-        testBotSpeed(5,5);
+        runTests();
         //20
         //400
         //8902
@@ -140,6 +135,7 @@ public class Main {
         }
         average/=sampleSize;
         System.out.println("Average: "+average +"ms");
+        System.out.println(bot.tree.size());
         return average;
     }
     public static void runTests(){
@@ -147,6 +143,20 @@ public class Main {
             Board b = new Board(9,3);
             b.populate();
             b.play(s);
+        }
+    }
+    public static void findBugs(int steps){
+        int bugCount=1;
+        while(true){
+            Board b = new Board(9,3);
+            b.populate();
+            Bot bot = new Bot();
+            try {
+                b.testBot(bot, steps);
+            }catch (Exception e){
+                saveMoveSet(bot.tree,"bug"+bugCount+".txt");
+                bugCount++;
+            }
         }
     }
 }

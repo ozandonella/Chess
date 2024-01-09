@@ -5,6 +5,20 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Board {
+    public enum GameState{
+        UNSET,
+        FREE,
+        CHECK,
+        CHECKMATE,
+        STALE;
+        public String getName(){
+            if(this==UNSET) return "UNSET";
+            else if(this==FREE) return "FREE";
+            else if(this==CHECK) return "CHECK";
+            else if(this==CHECKMATE) return "CHECKMATE";
+            else return "STALE";
+        }
+    }
     public MoveTree moveTree;
     public ArrayList<ArrayList<Piece>> board;
     public ArrayList<Piece> whitePieces;
@@ -13,7 +27,7 @@ public class Board {
     public King blackKing;
     public static final char[] letters = new char[]{'A','B','C','D','E','F','G','H'};
     public static final char[] numbers = new char[]{'1','2','3','4','5','6','7','8'};
-    public int gameState;
+    public GameState gameState;
     public boolean whiteTurn;
     public int moveCount;
     public Screen screen;
@@ -24,7 +38,7 @@ public class Board {
         this.Y=Y;
         screen=new Screen((X*8)+9,(Y*8)+9);
         drawDividers('-','|','+');
-        gameState=0;
+        gameState=GameState.FREE;
         whiteTurn=true;
         board=new ArrayList<>(8);
         whitePieces=new ArrayList<>();
@@ -63,16 +77,15 @@ public class Board {
         }
     }
     public void testBot(Bot bot, int steps){
-        while(gameState==0){
+        while(gameState==GameState.CHECK||gameState==GameState.FREE){
             MoveTree m =bot.findBestLine(steps,this);
             moveForward(moveTree.addMove(m.current.next.get((int)(Math.random()*m.current.next.size())).copy()));
             fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
             fillSquare('/',new int[]{moveTree.current.destHash%8,moveTree.current.destHash/8});
-            print();
+            printInfo();
             System.out.println();
         }
-        if(gameState==1) System.out.println("White Wins!");
-        else if(gameState==2) System.out.println("Black Wins!");
+        if(gameState==GameState.CHECKMATE) System.out.println((whiteTurn ? "Black" : "White") +" Wins!");
         else System.out.println("Stale Mate!");
     }
     public void playBot(Bot bot){
@@ -81,7 +94,7 @@ public class Board {
         System.out.println();
         int pieceThreshold=360/15;
         int steps=4;
-        while(gameState==0) {
+        while(gameState==GameState.CHECK||gameState==GameState.FREE) {
             if(!whiteTurn) {
                 String in = s.nextLine().toUpperCase();
                 if(in.equals("B")) moveBackward();
@@ -110,14 +123,13 @@ public class Board {
             System.out.println();
             moveTree.print();
         }
-        if(gameState==1) System.out.println("White Wins!");
-        else if(gameState==2) System.out.println("Black Wins!");
+        if(gameState==GameState.CHECKMATE) System.out.println((whiteTurn ? "Black" : "White") +" Wins!");
         else System.out.println("Stale Mate!");
     }
     public void play(){
         Scanner s = new Scanner(System.in);
         print();
-        while(gameState==0) {
+        while(gameState==GameState.CHECK||gameState==GameState.FREE) {
             String in = s.nextLine().toUpperCase();
             if(in.equals("B")) moveBackward();
             else if(in.equals("F")) moveForward(chooseMovePath());
@@ -134,12 +146,11 @@ public class Board {
             }
             fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
             fillSquare('/',new int[]{moveTree.current.destHash%8,moveTree.current.destHash/8});
-            print();
+            printInfo();
             System.out.println();
-            moveTree.print();
+            //moveTree.print();
         }
-        if(gameState==1) System.out.println("White Wins!");
-        else if(gameState==2) System.out.println("Black Wins!");
+        if(gameState==GameState.CHECKMATE) System.out.println((whiteTurn ? "Black" : "White") +" Wins!");
         else System.out.println("Stale Mate!");
     }
     public int chooseMovePath(){
@@ -210,18 +221,17 @@ public class Board {
             moveForward(moveTree.addMove(generateMove(query(pos),dest)));
             fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
             fillSquare('/',new int[]{moveTree.current.destHash%8,moveTree.current.destHash/8});
-            print();
+            printInfo();
             System.out.println();
             System.out.println(moveTree.current);
 
         }
         System.out.println();
-        if(gameState==0) return;
+        if(gameState==GameState.CHECK||gameState==GameState.FREE) return;
         print();
         System.out.println(whitePieces);
         System.out.println(blackPieces);
-        if(gameState==1) System.out.println("White Wins!");
-        else if(gameState==2) System.out.println("Black Wins!");
+        if(gameState==GameState.CHECKMATE) System.out.println((whiteTurn ? "Black" : "White") +" Wins!");
         else System.out.println("Stale Mate!");
     }
     public boolean existsMove(int[] pos, int[] dest, boolean isWhite){
@@ -244,12 +254,18 @@ public class Board {
         }
         for(Piece p : moveTree.current.former) set(null,p.position);
         for (Piece p : moveTree.current.current) set(p,p.position);
-        if(isInCheck(!whiteTurn)){
-            if(isMate(!whiteTurn)) gameState=whiteTurn ? 1 : 2;
-        }
-        else if(isStaleMate(!whiteTurn)) gameState=3;
         whiteTurn=!whiteTurn;
         moveCount++;
+        if(moveTree.current.gameState==GameState.UNSET) moveTree.current.gameState=getState();
+        gameState=moveTree.current.gameState;
+    }
+    public GameState getState(){
+        if(isInCheck(whiteTurn)){
+            if(isMate(whiteTurn)) return GameState.CHECKMATE;
+            return GameState.CHECK;
+        }
+        if(isStaleMate(whiteTurn)) return GameState.STALE;
+        return GameState.FREE;
     }
     public void moveBackward(){
         if(moveTree.current==moveTree.head) return;
@@ -257,8 +273,8 @@ public class Board {
         for (Piece p : moveTree.current.current) set(null,p.position);
         for(Piece p : moveTree.current.former) set(p,p.position);
         whiteTurn=!whiteTurn;
-        gameState=0;
         moveCount--;
+        gameState=moveTree.current.gameState;
         moveTree.prev();
     }
     public boolean isStaleMate(boolean isWhite){
@@ -299,9 +315,7 @@ public class Board {
     }
     public boolean isInCheck(boolean isWhite){
         King king = isWhite ? whiteKing : blackKing;
-        ArrayList<Piece> attackers = new ArrayList<>(isWhite ? blackPieces : whitePieces);
-        for(Piece p : attackers) if(p.canMove(king.position,this, false)) return true;
-        return false;
+        return king.inCheck(this);
     }
     public ArrayList<Piece> getAllAttacking(int[] dest, boolean isWhite, boolean withSafety){
         ArrayList<Piece> res = new ArrayList<>();
@@ -466,6 +480,15 @@ public class Board {
     public void fillSquare(char c, int[] dest){
         for(int y=0; y<Y; y++) setGraphic(Screen.fillX(String.valueOf(c),X),dest,y);
 
+    }
+    public void printInfo(){
+        print();
+        System.out.println();
+        System.out.print("Current Line: ");
+        moveTree.print();
+        System.out.println("Turn: "+(whiteTurn ? "White" : "Black"));
+        System.out.println("Move: "+moveCount);
+        System.out.println("Game State: "+gameState.getName());
     }
     public void drawDividers(char len, char height, char sect){
         for(int x=0; x<8; x++){

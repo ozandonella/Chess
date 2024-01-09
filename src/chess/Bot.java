@@ -40,9 +40,8 @@ public class Bot {
         return moves;
     }
     public int evalBoard(Board board){
-        if(board.gameState==1) return 400;
-        if(board.gameState==2) return -400;
-        if(board.gameState==3) return 0;
+        if(board.gameState== Board.GameState.CHECKMATE)return board.whiteTurn ? -400 : 400;
+        else if(board.gameState==Board.GameState.STALE) return 0;
         int whiteAttackers=0;
         int blackAttackers=0;
         int sum=0;
@@ -83,7 +82,7 @@ public class Bot {
     }*/
 
     public MoveNode growTree(int steps, Board board){
-        if(steps==0||board.gameState!=0){
+        if(steps==0||board.gameState==Board.GameState.STALE||board.gameState==Board.GameState.CHECKMATE){
             board.moveTree.current.value=evalBoard(board);
             return board.moveTree.current.copy();
         }
