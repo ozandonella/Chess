@@ -5,8 +5,8 @@ import java.util.Arrays;
 
 public class Horse extends Piece{
     public static final String name="Horse";
-    public Horse(boolean isWhite) {
-        super(isWhite);
+    public Horse(boolean isWhite, int index) {
+        super(isWhite, index);
         super.name=name;
     }
     @Override
@@ -14,7 +14,7 @@ public class Horse extends Piece{
         MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
         move.former.add(this);
         if(board.query(dest)!=null) move.former.add(board.query(dest));
-        Horse current = new Horse(isWhite);
+        Horse current = new Horse(isWhite, index);
         current.position[0]=dest[0];
         current.position[1]=dest[1];
         move.current.add(current);
@@ -30,7 +30,7 @@ public class Horse extends Piece{
         int[] tempPos=new int[]{position[0],position[1]};
         piece = board.pop(dest);
         board.set(board.pop(position),dest);
-        boolean inCheck=(board.whiteTurn ? board.whiteKing : board.blackKing).inCheck(board);
+        boolean inCheck=(board.whiteTurn ? board.getWhiteKing() : board.getBlackKing()).inCheck(board);
         board.set(board.pop(dest),tempPos);
         board.set(piece,dest);
         return !inCheck;
@@ -47,7 +47,7 @@ public class Horse extends Piece{
     }
 
     public Piece copy() {
-        Horse copy = new Horse(isWhite);
+        Horse copy = new Horse(isWhite, index);
         copy.position=new int[]{position[0],position[1]};
         return copy;
     }

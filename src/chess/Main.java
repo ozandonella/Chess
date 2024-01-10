@@ -2,6 +2,7 @@ package chess;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 public class Main {
     public static String[][] whitePieces;
@@ -17,8 +18,8 @@ public class Main {
             "enPassDebug.txt"
     };
     public static void main(String[] args) {
-        testBotSpeed(5,3);
-        //Ran with an average of 19030ms
+        testBotSpeed(5,5);
+        //Ran with an average of 14397ms
         //20
         //400
         //8902
@@ -108,7 +109,7 @@ public class Main {
     }
     public static void saveMoveSet(MoveTree m, String fileName){
         try {
-            File file = new File(fileName);
+            File file = new File("C:\\Users\\Oxsar\\Coding\\Java\\Chess\\Bugs\\"+fileName);
             if (file.exists()) throw new RuntimeException("file already exists");
             PrintWriter write = new PrintWriter(file);
             ArrayList<MoveNode> mainBranch=m.getMainBranch();
@@ -125,9 +126,9 @@ public class Main {
         long average=0;
         long size=0;
         for(int x=1; x<=sampleSize; x++){
-            Bot bot = new Bot();
             Board b = new Board(9,3);
             b.populate();
+            Bot bot = new Bot();
             long t=System.currentTimeMillis();
             bot.findBestLine(steps,b);
             t=System.currentTimeMillis()-t;
@@ -145,6 +146,9 @@ public class Main {
             Board b = new Board(9,3);
             b.populate();
             b.play(s);
+            System.out.println();
+            System.out.println(Arrays.toString(b.whitePieces));
+            System.out.println(Arrays.toString(b.blackPieces));
         }
     }
     public static void findBugs(int steps){

@@ -7,8 +7,8 @@ public class Rook extends Piece{
     public static final String name="Rook";
     public boolean hasMoved;
 
-    public Rook(boolean isWhite) {
-        super(isWhite);
+    public Rook(boolean isWhite, int index) {
+        super(isWhite, index);
         super.name=name;
         hasMoved=false;
     }
@@ -17,7 +17,7 @@ public class Rook extends Piece{
         MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
         move.former.add(this);
         if(board.query(dest)!=null) move.former.add(board.query(dest));
-        Rook current = new Rook(isWhite);
+        Rook current = new Rook(isWhite, index);
         current.hasMoved=true;
         current.position[0]=dest[0];
         current.position[1]=dest[1];
@@ -32,7 +32,7 @@ public class Rook extends Piece{
         int[] tempPos=new int[]{position[0],position[1]};
         Piece piece = board.pop(dest);
         board.set(board.pop(position),dest);
-        boolean inCheck=(board.whiteTurn ? board.whiteKing : board.blackKing).inCheck(board);
+        boolean inCheck=(board.whiteTurn ? board.getWhiteKing() : board.getBlackKing()).inCheck(board);
         board.set(board.pop(dest),tempPos);
         board.set(piece,dest);
         return !inCheck;
@@ -56,7 +56,7 @@ public class Rook extends Piece{
     }
 
     public Piece copy() {
-        Rook copy = new Rook(isWhite);
+        Rook copy = new Rook(isWhite, index);
         copy.hasMoved=hasMoved;
         copy.position=new int[]{position[0],position[1]};
         return copy;

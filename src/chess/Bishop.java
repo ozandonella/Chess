@@ -5,8 +5,8 @@ import java.util.Arrays;
 
 public class Bishop extends Piece{
     public static final String name="Bishop";
-    public Bishop(boolean isWhite) {
-        super(isWhite);
+    public Bishop(boolean isWhite, int index) {
+        super(isWhite, index);
         super.name=name;
     }
     @Override
@@ -14,7 +14,7 @@ public class Bishop extends Piece{
         MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
         move.former.add(this);
         if(board.query(dest)!=null) move.former.add(board.query(dest));
-        Bishop current = new Bishop(isWhite);
+        Bishop current = new Bishop(isWhite, index);
         current.position[0]=dest[0];
         current.position[1]=dest[1];
         move.current.add(current);
@@ -28,7 +28,7 @@ public class Bishop extends Piece{
         int[] tempPos=new int[]{position[0],position[1]};
         Piece piece = board.pop(dest);
         board.set(board.pop(position),dest);
-        boolean inCheck=(board.whiteTurn ? board.whiteKing : board.blackKing).inCheck(board);
+        boolean inCheck=(board.whiteTurn ? board.getWhiteKing() : board.getBlackKing()).inCheck(board);
         board.set(board.pop(dest),tempPos);
         board.set(piece,dest);
         return !inCheck;
@@ -48,7 +48,7 @@ public class Bishop extends Piece{
     }
 
     public Piece copy() {
-        Bishop copy = new Bishop(isWhite);
+        Bishop copy = new Bishop(isWhite, index);
         copy.position=new int[]{position[0],position[1]};
         return copy;
     }

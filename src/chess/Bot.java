@@ -9,7 +9,7 @@ public class Bot {
     }
     public ArrayList<MoveNode> generateMoves(boolean isWhite, Board board){
         ArrayList<MoveNode> moves = new ArrayList<>();
-        ArrayList<Piece> pieces = new ArrayList<>(isWhite ? board.whitePieces : board.blackPieces);
+        ArrayList<Piece> pieces = isWhite ? board.getWhitePieces() : board.getBlackPieces();
         for(Piece piece : pieces){
             for(int[] d : board.getMoves(piece)){
                 if((d[1]==0||d[1]==7)&&piece.getName().equals(Pawn.name)){
@@ -19,8 +19,8 @@ public class Bot {
                         Piece p;
                         move.former.add(piece);
                         if(cap!=null) move.former.add(cap);
-                        if(x==0) p=new Horse(piece.isWhite);
-                        else p=new Queen(piece.isWhite);
+                        if(x==0) p=new Horse(piece.isWhite, piece.index);
+                        else p=new Queen(piece.isWhite, piece.index);
                         p.position=d;
                         move.current.add(p);
                         move.posHash=Board.getHash(piece.position);
@@ -45,12 +45,14 @@ public class Bot {
         int whiteAttackers=0;
         int blackAttackers=0;
         int sum=0;
-        for(Piece p : board.whitePieces){
-            if(p.name.charAt(0)!='P'&&Math.abs(p.position[0]-board.blackKing.position[0])<4&&Math.abs(p.position[1]-board.blackKing.position[1])<4) whiteAttackers++;
+        King blackKing=board.getBlackKing();
+        King whiteKing=board.getWhiteKing();
+        for(Piece p : board.getWhitePieces()){
+            if(p.name.charAt(0)!='P'&&Math.abs(p.position[0]-blackKing.position[0])<4&&Math.abs(p.position[1]-blackKing.position[1])<4) whiteAttackers++;
             sum+=p.getPointValue();
         }
-        for (Piece p : board.blackPieces){
-            if(p.name.charAt(0)!='P'&&Math.abs(p.position[0]-board.whiteKing.position[0])<4&&Math.abs(p.position[1]-board.whiteKing.position[1])<4) blackAttackers++;
+        for (Piece p : board.getBlackPieces()){
+            if(p.name.charAt(0)!='P'&&Math.abs(p.position[0]-whiteKing.position[0])<4&&Math.abs(p.position[1]-whiteKing.position[1])<4) blackAttackers++;
             sum-=p.getPointValue();
         }
         if(whiteAttackers!=0)whiteAttackers=1+whiteAttackers/2;

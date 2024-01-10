@@ -1,13 +1,14 @@
 package chess;
-
 import java.util.ArrayList;
 
 public abstract class Piece{
     public String name;
     public final boolean isWhite;
     public int[] position;
+    public final int index;
 
-    public Piece(boolean isWhite){
+    public Piece(boolean isWhite, int index){
+        this.index=index;
         position=new int[2];
         this.isWhite=isWhite;
     }

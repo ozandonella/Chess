@@ -1,13 +1,12 @@
 package chess;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Pawn extends Piece{
     public static final String name="Pawn";
     private Integer turnMoved;
-    public Pawn(boolean isWhite) {
-        super(isWhite);
+    public Pawn(boolean isWhite, int index) {
+        super(isWhite, index);
         super.name=name;
     }
     @Override
@@ -15,7 +14,7 @@ public class Pawn extends Piece{
         MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
         move.former.add(this);
         if(board.query(dest)!=null) move.former.add(board.query(dest));
-        Pawn current = new Pawn(isWhite);
+        Pawn current = new Pawn(isWhite, index);
         if(turnMoved==null) current.turnMoved=board.moveCount;
         else current.turnMoved=turnMoved;
         current.position[0]=dest[0];
@@ -39,7 +38,7 @@ public class Pawn extends Piece{
         Piece p = enPass==null ? null : board.query(enPass);
         board.set(board.pop(position),dest);
         if(p!=null) board.pop(enPass);
-        boolean inCheck=(board.whiteTurn ? board.whiteKing : board.blackKing).inCheck(board);
+        boolean inCheck=(board.whiteTurn ? board.getWhiteKing() : board.getBlackKing()).inCheck(board);
         board.set(board.pop(dest),tempPos);
         if(p!=null) board.set(p,enPass);
         board.set(piece,dest);
@@ -74,7 +73,7 @@ public class Pawn extends Piece{
     }
     @Override
     public Piece copy() {
-        Pawn copy = new Pawn(isWhite);
+        Pawn copy = new Pawn(isWhite, index);
         copy.position=new int[]{position[0],position[1]};
         copy.turnMoved=turnMoved;
         return copy;

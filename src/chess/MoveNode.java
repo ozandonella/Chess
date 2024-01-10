@@ -7,6 +7,7 @@ public class MoveNode {
     public ArrayList<Piece> former;
     public ArrayList<MoveNode> next;
     public MoveNode prev;
+
     public String name;
     public int value;
     public int posHash;

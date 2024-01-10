@@ -4,8 +4,8 @@ import java.util.ArrayList;
 public class King extends Piece{
     public static final String name="King";
     public boolean hasMoved;
-    public King(boolean isWhite) {
-        super(isWhite);
+    public King(boolean isWhite, int index) {
+        super(isWhite, index);
         super.name=name;
         hasMoved=false;
     }
@@ -15,14 +15,14 @@ public class King extends Piece{
         MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
         move.former.add(this);
         if(board.query(dest)!=null) move.former.add(board.query(dest));
-        King current = new King(isWhite);
+        King current = new King(isWhite, index);
         current.position[0]=dest[0];
         current.position[1]=dest[1];
         current.hasMoved=true;
         move.current.add(current);
         if(Math.abs(x)==2){
             Rook fRook = ((Rook)board.query(new int[]{x<0 ? 0 : 7, dest[1]}));
-            Rook cRook =  new Rook(fRook.isWhite);
+            Rook cRook =  new Rook(fRook.isWhite, fRook.index);
             cRook.position[0]=dest[0] + (x<0 ? 1 : -1);
             cRook.position[1]=dest[1];
             cRook.hasMoved=true;
@@ -49,7 +49,7 @@ public class King extends Piece{
         if(rookDest!=null) board.set(board.pop(rookPos),rookDest);
         Piece piece = board.pop(dest);
         board.set(board.pop(position),dest);
-        boolean inCheck=(board.whiteTurn ? board.whiteKing : board.blackKing).inCheck(board);
+        boolean inCheck=(board.whiteTurn ? board.getWhiteKing() : board.getBlackKing()).inCheck(board);
         if(rookDest!=null) board.set(board.pop(rookDest),rookPos);
         board.set(board.pop(dest),tempPos);
         board.set(piece,dest);
@@ -141,7 +141,7 @@ public class King extends Piece{
     }
     @Override
     public Piece copy() {
-        King copy = new King(isWhite);
+        King copy = new King(isWhite, index);
         copy.position=new int[]{position[0],position[1]};
         copy.hasMoved=hasMoved;
         return copy;
