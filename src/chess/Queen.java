@@ -11,7 +11,7 @@ public class Queen extends Piece{
 
     @Override
      public MoveNode generateMove(int[] dest, Board board) {
-        MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
+        MoveNode move = new MoveNode();
         move.former.add(this);
         if(board.query(dest)!=null) move.former.add(board.query(dest));
         Queen current = new Queen(isWhite, index);

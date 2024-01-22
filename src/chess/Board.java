@@ -75,7 +75,9 @@ public class Board {
     public void testBot(Bot bot, int steps){
         while(moveCount<200&&(gameState==GameState.CHECK||gameState==GameState.FREE)){
             MoveTree m =bot.findBestLine(steps,this);
-            moveForward(moveTree.addMove(m.current.next.get((int)(Math.random()*m.current.next.size())).copy()));
+            MoveNode move = m.current.next.get((int)(Math.random()*m.current.next.size())).copy();
+            move.setName();
+            moveForward(moveTree.addMoveSafe(move));
             fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
             fillSquare('/',new int[]{moveTree.current.destHash%8,moveTree.current.destHash/8});
             printInfo();
@@ -88,7 +90,6 @@ public class Board {
         Scanner s = new Scanner(System.in);
         print();
         System.out.println();
-        int pieceThreshold=360/15;
         int steps=4;
         while(gameState==GameState.CHECK||gameState==GameState.FREE) {
             if(!whiteTurn) {
@@ -104,12 +105,16 @@ public class Board {
                         System.out.println("move at "+convertPos(pos)+" -> "+convertPos(dest)+" does not exist");
                         continue;
                     }
-                    moveForward(moveTree.addMove(generateMove(query(pos),dest)));
+                    MoveNode move = generateMove(query(pos),dest);
+                    move.setName();
+                    moveForward(moveTree.addMoveSafe(move));
                 }
             }
             else {
                 MoveTree m =bot.findBestLine(steps,this);
-                moveForward(moveTree.addMove(m.current.next.get((int)(Math.random()*m.current.next.size())).copy()));
+                MoveNode move = m.current.next.get((int)(Math.random()*m.current.next.size())).copy();
+                move.setName();
+                moveForward(moveTree.addMoveSafe(move));
             }
             fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
             fillSquare('/',new int[]{moveTree.current.destHash%8,moveTree.current.destHash/8});
@@ -136,13 +141,15 @@ public class Board {
                     System.out.println("move at "+convertPos(pos)+" -> "+convertPos(dest)+" does not exist");
                     continue;
                 }
-                moveForward(moveTree.addMove(generateMove(query(pos),dest)));
+                MoveNode move = generateMove(query(pos),dest);
+                move.setName();
+                moveForward(moveTree.addMoveSafe(move));
             }
             fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
             fillSquare('/',new int[]{moveTree.current.destHash%8,moveTree.current.destHash/8});
             printInfo();
             System.out.println();
-            //moveTree.print();
+            moveTree.print();
         }
         if(gameState==GameState.CHECKMATE) System.out.println((whiteTurn ? "Black" : "White") +" Wins!");
         else System.out.println("Stale Mate!");
@@ -212,7 +219,9 @@ public class Board {
                 System.out.println("move at "+convertPos(pos)+" -> "+convertPos(dest)+" does not exist");
                 throw new RuntimeException("DNE");
             }
-            moveForward(moveTree.addMove(generateMove(query(pos),dest)));
+            MoveNode move = generateMove(query(pos),dest);
+            move.setName();
+            moveForward(moveTree.addMoveSafe(move));
             fillSquare('=',new int[]{moveTree.current.posHash%8,moveTree.current.posHash/8});
             fillSquare('/',new int[]{moveTree.current.destHash%8,moveTree.current.destHash/8});
             printInfo();
@@ -223,8 +232,6 @@ public class Board {
         System.out.println();
         if(gameState==GameState.CHECK||gameState==GameState.FREE) return;
         print();
-        System.out.println(whitePieces);
-        System.out.println(blackPieces);
         if(gameState==GameState.CHECKMATE) System.out.println((whiteTurn ? "Black" : "White") +" Wins!");
         else System.out.println("Stale Mate!");
     }
@@ -441,7 +448,7 @@ public class Board {
         ArrayList<MoveNode> promotions = new ArrayList<>();
         Piece cap = query(dest);
         for(int x=0; x<4; x++){
-            MoveNode move = new MoveNode(p + " -> "+Board.convertPos(dest));
+            MoveNode move = new MoveNode();
             Piece piece;
             move.former.add(p);
             if(cap!=null) move.former.add(cap);
@@ -451,7 +458,6 @@ public class Board {
             else piece=new Queen(p.isWhite,p.index);
             piece.position=dest;
             move.current.add(piece);
-            move.name+="("+move.current.get(0).getName()+")";
             promotions.add(move);
         }
         return promotions;

@@ -12,7 +12,7 @@ public class King extends Piece{
     @Override
     public MoveNode generateMove(int[] dest, Board board) {
         int x = dest[0]-position[0];
-        MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
+        MoveNode move = new MoveNode();
         move.former.add(this);
         if(board.query(dest)!=null) move.former.add(board.query(dest));
         King current = new King(isWhite, index);

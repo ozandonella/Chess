@@ -6,9 +6,10 @@ public class MoveTree{
     public MoveNode head;
     public MoveNode current;
     public MoveTree(){
-        head=new MoveNode("Game Start");
-        head.gameState= Board.GameState.FREE;
+        head=new MoveNode();
+        head.gameState=Board.GameState.FREE;
         current=head;
+        head.setName();
     }
     /**
      * Adds given node to the trees current node's next list if the move does not exist
@@ -16,14 +17,17 @@ public class MoveTree{
      * @param node given node
      * @return given node position in current.next
      */
-    public int addMove(MoveNode node){
+    public int addMoveSafe(MoveNode node){
         for (int x=0; x<current.next.size(); x++) {
             MoveNode m = current.next.get(x);
             if (m.posHash == node.posHash && m.destHash == node.destHash && node.name.equals(m.name)) return x;
         }
+        addMove(node);
+        return current.next.size()-1;
+    }
+    public void addMove(MoveNode node){
         current.next.add(node);
         node.prev=current;
-        return current.next.size()-1;
     }
     public void prev(){
         if(current==head) return;
@@ -39,9 +43,8 @@ public class MoveTree{
             m.prev=current.prev;
             m.prev.next.remove(current);
             prev();
-            next(addMove(m));
+            next(addMoveSafe(m));
         }
-
     }
     public void setHead(MoveNode m){
         head=m;
@@ -64,7 +67,7 @@ public class MoveTree{
         while(prev!=null){
             MoveNode cHolder=current;
             current=prev.copy();
-            addMove(cHolder);
+            addMoveSafe(cHolder);
             prev=prev.prev;
         }
         setHead(current);
@@ -73,7 +76,7 @@ public class MoveTree{
     public static void synch(MoveTree tree, MoveTree synchTo){
         ArrayList<MoveNode> mainBranch = synchTo.getMainBranch();
         tree.current=tree.head;
-        for(int x=mainBranch.size()-2; x>=0; x--)tree.next(tree.addMove(mainBranch.get(x)));
+        for(int x=mainBranch.size()-2; x>=0; x--)tree.next(tree.addMoveSafe(mainBranch.get(x)));
     }
     public void printCurrentLine(){
         ArrayList<MoveNode> mainBranch=getMainBranch();
@@ -82,17 +85,17 @@ public class MoveTree{
         System.out.println(line);
     }
 
-    /**
+    /*
      * returns copies of the nodes leading up to the current node in REVERSE ORDER
      */
     public ArrayList<MoveNode> getMainBranch(){
         ArrayList<MoveNode> mainBranch=new ArrayList<>();
         MoveNode temp=current;
-        while(temp!=head){
+        while(temp!=null){
             mainBranch.add(temp.copy());
+            mainBranch.get(mainBranch.size()-1).setName();
             temp=temp.prev;
         }
-        mainBranch.add(head.copy());
         return mainBranch;
     }
     public long size(){

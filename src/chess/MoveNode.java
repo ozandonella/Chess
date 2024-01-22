@@ -7,15 +7,13 @@ public class MoveNode {
     public ArrayList<Piece> former;
     public ArrayList<MoveNode> next;
     public MoveNode prev;
-
     public String name;
     public int value;
     public int posHash;
     public int destHash;
     public Board.GameState gameState;
-    public MoveNode(String name){
+    public MoveNode(){
         gameState=Board.GameState.UNSET;
-        this.name=name;
         next=new ArrayList<>();
         current=new ArrayList<>();
         former=new ArrayList<>();
@@ -29,10 +27,11 @@ public class MoveNode {
         for(int x=1; x<next.size(); x++) next.get(x).print(newLine);
     }
     public String toString(){
-        return name+" ("+posHash+","+destHash+") "+value;
+        return name;
     }
     public MoveNode copy(){
-        MoveNode copy = new MoveNode(name);
+        MoveNode copy = new MoveNode();
+        if(name!=null) copy.name=name;
         copy.value=value;
         copy.posHash=posHash;
         copy.destHash=destHash;
@@ -54,5 +53,18 @@ public class MoveNode {
         long k = 0;
         for(MoveNode m : next) k+=m.size();
         return k;
+    }
+    public void setName(){
+        if(former.isEmpty()){
+            name="GameStart";
+            return;
+        }
+        Piece p = former.get(0);
+        name=(p.isWhite ? "White " : "Black ") + p.name + " ["+decodeHash()+"]";
+        if(p.name.charAt(0)!=current.get(0).name.charAt(0)) name+= " ("+current.get(0).name+")";
+    }
+    public void setNameRec(){
+        setName();
+        for(MoveNode m : next) m.setName();
     }
 }

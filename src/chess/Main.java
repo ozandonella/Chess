@@ -18,7 +18,9 @@ public class Main {
             "enPassDebug.txt"
     };
     public static void main(String[] args) {
-        testBotSpeed(5,5);
+        Board b = new Board(9,3);
+        b.populate();
+        b.testBot(new Bot(), 4);
         //Ran with an average of 14397ms
         //20
         //400

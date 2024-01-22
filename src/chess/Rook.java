@@ -14,7 +14,7 @@ public class Rook extends Piece{
     }
     @Override
     public MoveNode generateMove(int[] dest, Board board) {
-        MoveNode move = new MoveNode(this + " -> "+Board.convertPos(dest));
+        MoveNode move = new MoveNode();
         move.former.add(this);
         if(board.query(dest)!=null) move.former.add(board.query(dest));
         Rook current = new Rook(isWhite, index);
